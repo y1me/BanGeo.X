@@ -25,10 +25,10 @@ void pps_init(void) {
   PPSLOCK = 0xaa;
   PPSLOCKbits.PPSLOCKED = 0;		// unlock PPS
 
-  RC3PPSbits.RC3PPS = 0x18; //SCK
-  RC4PPSbits.RC4PPS = 0x19; //SDA
-  SSP1CLKPPSbits.SSP1CLKPPS = 0x13; //
-  SSP1DATPPSbits.SSP1DATPPS = 0x14;
+  RA2PPSbits.RA2PPS = 0x18; //SCK
+  RA4PPSbits.RA4PPS = 0x19; //SDA
+  SSP1CLKPPSbits.SSP1CLKPPS = 0x02; //
+  SSP1DATPPSbits.SSP1DATPPS = 0x04;
   
   PPSLOCK = 0x55;
   PPSLOCK = 0xaa;
@@ -40,20 +40,18 @@ void I2C_Init(void)  //init SPI Bus
 //I2C Bus register
     SSP1CON1bits.SSPEN = 0;
     SSP1STAT &= 0x3F;
-    SSP1ADD = 0x19;
+    SSP1ADD = 0x4F; // 100KHz
     SSP1CON1bits.SSPM = 8;
     SSP1CON1bits.CKP = 1;
     SSP1CON3bits.SCIE = 1;
     SSP1CON3bits.PCIE = 1;
     //I2C Bus pin
-    ANSELCbits.ANSC3 = 0;
-    ANSELCbits.ANSC4 = 0;
-    TRISCbits.TRISC3 = INPUT_PIN;
-    TRISCbits.TRISC4 = INPUT_PIN;
-    ODCONCbits.ODCC3 = 1;
-    ODCONCbits.ODCC4 = 1;
-    INLVLCbits.INLVLC0 = 1;
-    INLVLCbits.INLVLC1 = 1;
+    ANSELAbits.ANSA2 = 0;
+    ANSELAbits.ANSA4 = 0;
+    TRISAbits.TRISA2 = INPUT_PIN;
+    TRISAbits.TRISA4 = INPUT_PIN;
+    ODCONAbits.ODCA2 = 1;
+    ODCONAbits.ODCA4 = 1;
     
     PIE1bits.SSP1IE = 1;
     
