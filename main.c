@@ -66,6 +66,29 @@ volatile struct chbitsalt{
 
 					}flagalt ;
 
+uint8_t i2c_state = S_MASTER_IDLE;
+                    
+void interrupt ISR(void)
+{
+    if (I2C_INT_F)
+    {
+        I2C_INT_F = 0;
+        switch (i2c_state) {
+            case S_MASTER_IDLE:
+                break;
+            case S_MASTER_START:
+                break;
+            case S_MASTER_RESTART:
+                break;
+            case S_MASTER_SEND_DATA:
+                break;
+            case S_MASTER_RCV_DATA:
+                break;
+            case S_MASTER_STOP:
+                break;
+        }
+    }
+}
 
 void I2C_Master_Wait()
 {
@@ -126,17 +149,18 @@ void main(void)
 	flagalt.bit7 = 0;
  
     I2C_Master_Wait();
-    I2C_Master_RepeatedStart();
-    I2C_Master_Write(0xEE);
     while (1) {
         
-    I2C_Master_RepeatedStart();
-    I2C_Master_Write(0xAA); // Add your application code
-    I2C_Master_RepeatedStart();
-    I2C_Master_Write(0x12); // Add your application code
-    I2C_Master_RepeatedStart();
-    I2C_Master_Write(0x25); // Add your application code
+    I2C_Master_Start();
+    I2C_Master_Write(0x91); // Add your application code
     I2C_Master_Stop();
+    I2C_Master_Start();
+    I2C_Master_Write(0x12); // Add your application code
+    I2C_Master_Stop();
+    I2C_Master_Start();
+    I2C_Master_Write(0x93); // Add your application code
+    I2C_Master_Stop();
+
         
     }
 

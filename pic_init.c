@@ -53,10 +53,7 @@ void I2C_Init(void)  //init SPI Bus
     ODCONAbits.ODCA2 = 1;
     ODCONAbits.ODCA4 = 1;
     
-    PIE1bits.SSP1IE = 1;
-    
     SSP1CON1bits.SSPEN = 1;
-    I2C_SEN = 1; 
 }
 
 void USART_Init(void)  //init USART
@@ -83,8 +80,14 @@ void USART_Init(void)  //init USART
 
 void INT_Init(void)  //init Interrupt
 {
+    //I2C interrupt
+    PIE1bits.SSP1IE = 1;
+    
+    // INT Reg control
+    INTCONbits.GIE = 1;
+    INTCONbits.PEIE = 1;
     /*
-	RCONbits.IPEN = 1;
+	RCONbits.IINTCONPEN = 1;
 	
 	INTCONbits.GIE_GIEH = 1;
 	INTCONbits.PEIE_GIEL = 1;
