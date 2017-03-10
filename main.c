@@ -66,7 +66,7 @@ volatile struct chbitsalt{
 
 					}flagalt ;
 
-uint8_t i2c_state = S_MASTER_IDLE;
+char i2c_state = S_MASTER_IDLE;
                     
 void interrupt ISR(void)
 {
