@@ -24,18 +24,19 @@ void pps_init(void) {
   PPSLOCK = 0x55;
   PPSLOCK = 0xaa;
   PPSLOCKbits.PPSLOCKED = 0;		// unlock PPS
-
+  /*****I2C*****/
   RA2PPSbits.RA2PPS = 0x18; //SCK
   RA4PPSbits.RA4PPS = 0x19; //SDA
   SSP1CLKPPSbits.SSP1CLKPPS = 0x02; //
   SSP1DATPPSbits.SSP1DATPPS = 0x04;
-  
+  /*****PWM*****/
+ RC3PPSbits.RC3PPS = 0x02; 
   PPSLOCK = 0x55;
   PPSLOCK = 0xaa;
   PPSLOCKbits.PPSLOCKED = 1;		// lock PPS
 }
 
-void I2C_Init(void)  //init SPI Bus
+void I2C_Init(void)  //init I2C Bus
 {
 //I2C Bus register
     SSP1CON1bits.SSPEN = 0;
@@ -54,6 +55,15 @@ void I2C_Init(void)  //init SPI Bus
     ODCONAbits.ODCA4 = 1;
     
     SSP1CON1bits.SSPEN = 1;
+}
+
+void I2C_Init(void)  //init PWM
+{
+
+PWM5CON = 0x80;
+PWM5DCH = 0x04;
+PWM5DCL = 0x80;
+
 }
 
 void USART_Init(void)  //init USART
@@ -149,19 +159,12 @@ void Timer1_Init(void)  //init timer1
 
 void Timer2_Init(void)  //init timer2
 {
-/*
-	T2CONbits.T2OUTPS0 = 1;
-        T2CONbits.T2OUTPS1 = 0;
-        T2CONbits.T2OUTPS2 = 0;
-        T2CONbits.T2OUTPS3 = 0;
-	T2CONbits.T2CKPS = 1;
+    T2CON = 0x00;
+    PR2 = 0x0F;
+    TMR2 = 0x00;
+    // Clearing IF flag before enabling the interrupt.
+PIR1bits.TMR2IF = 0;
+PIE1bits.TMR2IE = 1;
+T2CONbits.TMR2ON = 1;
 
-        PR2 = 125;
-        TMR2 = 0;
-
-	PIE1bits.TMR2IE = 1;
-	IPR1bits.TMR2IP = 1;
-
-	T2CONbits.TMR2ON = 1;
-*/
 }

@@ -71,6 +71,12 @@ extern int I2CTimeout;
                     
 void interrupt ISR(void)
 {
+    if(INTCONbits.PEIE == 1 && PIE1bits.TMR2IE == 1 && PIR1bits.TMR2IF == 1)
+    {
+        TMR2 = 0x00;
+        PIR1bits.TMR2IF = 0;
+        I2CTimeout++;
+    }
 
 }
 
