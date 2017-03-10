@@ -81,7 +81,7 @@ void USART_Init(void)  //init USART
 void INT_Init(void)  //init Interrupt
 {
     //I2C interrupt
-    PIE1bits.SSP1IE = 1;
+    PIE1bits.SSP1IE = 0;
     
     // INT Reg control
     INTCONbits.GIE = 1;

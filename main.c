@@ -66,57 +66,12 @@ volatile struct chbitsalt{
 
 					}flagalt ;
 
-char i2c_state = S_MASTER_IDLE;
+extern int I2CTimeout;
+
                     
 void interrupt ISR(void)
 {
-    if (I2C_INT_F)
-    {
-        I2C_INT_F = 0;
-        switch (i2c_state) {
-            case S_MASTER_IDLE:
-                break;
-            case S_MASTER_START:
-                break;
-            case S_MASTER_RESTART:
-                break;
-            case S_MASTER_SEND_DATA:
-                break;
-            case S_MASTER_RCV_DATA:
-                break;
-            case S_MASTER_STOP:
-                break;
-        }
-    }
-}
 
-void I2C_Master_Wait()
-{
-  while (SSPSTATbits.R_nW || (SSP1CON2 & 0x1F)); //Transmit is in progress
-}                   
-
-void I2C_Master_Start()
-{
-  I2C_Master_Wait();    
-  SSP1CON2bits.SEN = 1;             //Initiate start condition
-}
-
-void I2C_Master_RepeatedStart()
-{
-  I2C_Master_Wait();
-  SSP1CON2bits.RSEN = 1;           //Initiate repeated start condition
-}
-
-void I2C_Master_Write(unsigned d)
-{
-  I2C_Master_Wait();
-  SSP1BUF = d;         //Write data to SSPBUF
-}
-
-void I2C_Master_Stop()
-{
-  I2C_Master_Wait();
-  SSP1CON2bits.PEN = 1;           //Initiate stop condition
 }
 
 volatile int i,z;
@@ -148,18 +103,7 @@ void main(void)
 	flagalt.free3 = 0;
 	flagalt.bit7 = 0;
  
-    I2C_Master_Wait();
     while (1) {
-        
-    I2C_Master_Start();
-    I2C_Master_Write(0x91); // Add your application code
-    I2C_Master_Stop();
-    I2C_Master_Start();
-    I2C_Master_Write(0x12); // Add your application code
-    I2C_Master_Stop();
-    I2C_Master_Start();
-    I2C_Master_Write(0x93); // Add your application code
-    I2C_Master_Stop();
 
         
     }

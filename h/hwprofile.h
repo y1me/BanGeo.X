@@ -2,6 +2,19 @@
 
 
     #define HARDWARE_PROFILE_H
+/** DEBUG ***********************************************************/
+    #define I2CFreeBusFail      0x01        
+    #define I2CStartFail        0x02
+    #define I2COpcodeFail       0x03
+    #define I2CRegaddFail       0x04
+    #define I2CSdataFail        0x05
+    #define I2CStopFail         0x06
+    #define I2CRestartFail      0x07
+    #define I2CReicvFail        0x08
+    #define I2CAcknFail         0x10
+
+
+
 
     #define CLOCK_FREQ          32000000
     #define Time_info           20000
@@ -26,23 +39,7 @@
 	#define VOFFCHG             PORTAbits.RA5
     #define VTEMP               PORTAbits.RA4
     
-    /** I2C ************************************************************/
-	#define I2C_ACKEN             SSP1CON2bits.ACKEN
-	#define I2C_ACKDT             SSP1CON2bits.ACKDT
-    #define I2C_ACKSTAT           SSP1CON2bits.ACKSTAT
-    #define I2C_GCEN              SSP1CON2bits.GCEN
-    #define I2C_PEN               SSP1CON2bits.PEN
-    #define I2C_RCEN              SSP1CON2bits.RCEN
-    #define I2C_RSEN              SSP1CON2bits.RSEN
-    #define I2C_SEN               SSP1CON2bits.SEN
-	#define I2C_BUFF              SSP1BUF
-	#define I2C_INT_F             PIR1bits.SSP1IF
-    #define S_MASTER_IDLE         0x01
-    #define S_MASTER_START        0x02 
-    #define S_MASTER_RESTART      0x03
-    #define S_MASTER_SEND_DATA    0x04
-    #define S_MASTER_RCV_DATA     0x05
-    #define S_MASTER_STOP         0x06
+
            
     /** EUSART ************************************************************/   
     #define UART_TX_INT_F   PIR3bits.TX2IF
