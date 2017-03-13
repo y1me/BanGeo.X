@@ -39,6 +39,7 @@
 #include <string.h>
 #include "./h/pic_init.h"
 #include "./h/hwprofile.h"
+#include "./h/i2c.h"
 
 
 
@@ -89,8 +90,11 @@ void main(void)
     VOFFCHG = 0; //Shutdown charger
     pps_init();
     Port_Init();
+    INT_Init();
     I2C_Init();
-    //if (PIR1bits.BCL1IF) PIR1bits.BCL1IF = 0;    
+    Timer2_Init();
+    PWM_Init();
+       
     flag.spi = 0; 
 	flag.tim0 = 0; 
 	flag.int1 = 0; 
@@ -108,8 +112,18 @@ void main(void)
 	flagalt.bit5 = 0;
 	flagalt.free3 = 0;
 	flagalt.bit7 = 0;
- 
+    
+    char test[] = { 0x00, 0x00, 0x00, 0x00};
+    char test2[] = { 0xFF, 0xFF, 0xFF};
+    char test3[] = { 0x00, 0x00, 0x00};
+    char test4[] = { 0x00, 0x00, 0x00};
+    char error;
     while (1) {
+        error = I2C_Write(0x27, 0x00, test, 4);
+        error = I2C_Write(0x27, 0x09, test2, 1);
+        error = I2C_Write(0x27, 0x09, test3, 1);
+        //error = I2C_Read(0x27, 0x00, test4, 3);
+        
 
         
     }

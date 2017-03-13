@@ -13,7 +13,8 @@ void Port_Init(void)  //init i/o PIC for enable DAC
     //Set/Unset analog pin
 
     ANSELAbits.ANSA5 = 0;
-    
+    ANSELCbits.ANSC3 = 0;
+    TRISCbits.TRISC3 = OUTPUT_PIN;
     TRISAbits.TRISA5 = OUTPUT_PIN;
     TRISAbits.TRISA4 = INPUT_PIN;
 
@@ -41,7 +42,7 @@ void I2C_Init(void)  //init I2C Bus
 //I2C Bus register
     SSP1CON1bits.SSPEN = 0;
     SSP1STAT &= 0x3F;
-    SSP1ADD = 0x4F; // 100KHz
+    SSP1ADD = 0x13; // 400KHz
     SSP1CON1bits.SSPM = 8;
     SSP1CON1bits.CKP = 1;
     SSP1CON3bits.SCIE = 1;
@@ -57,10 +58,10 @@ void I2C_Init(void)  //init I2C Bus
     SSP1CON1bits.SSPEN = 1;
 }
 
-void I2C_Init(void)  //init PWM
+void PWM_Init(void)  //init PWM
 {
 
-PWM5CON = 0x80;
+//PWM5CON = 0x80;
 PWM5DCH = 0x04;
 PWM5DCL = 0x80;
 

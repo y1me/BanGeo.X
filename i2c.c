@@ -26,7 +26,7 @@ char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
     while (I2CnTransmit || (I2CBusy)) 
         if ( I2CTimeout > I2CMaxTimeout )  return I2CRegaddFail;
     
-    while (length < len)
+    while (length > len)
     {
         len++;
         I2C_BUFF = *pdata;
