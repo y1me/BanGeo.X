@@ -3,12 +3,13 @@
 
 int I2CTimeout;
 
-char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
+/** P R I V A T E  P R O T O T Y P E S ***************************************/
+char I2C_Op_Reg( uint8_t , uint8_t );
+/*****************************************************************************/
+
+char I2C_Op_Reg( uint8_t op, uint8_t reg)
 {
-    I2CTimeout = 0;
-    char len =0;
-    
-    while (I2CnTransmit || (I2CBusy)) 
+     while (I2CnTransmit || (I2CBusy)) 
         if ( I2CTimeout > I2CMaxTimeout )  return I2CFreeBusFail;
             
     I2C_Start = 1;             //Initiate start condition
@@ -16,15 +17,24 @@ char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
     while (I2CnTransmit || (I2CBusy)) 
             if ( I2CTimeout > I2CMaxTimeout )  return I2CStartFail;
 
-    I2C_BUFF = (opcode << 1 & I2C_W_Bit);
+    I2C_BUFF = (op << 1 & I2C_W_Bit);
     
     while (I2CnTransmit || (I2CBusy)) 
             if ( I2CTimeout > I2CMaxTimeout )  return I2COpcodeFail;
     
-    I2C_BUFF = regadd;
+    I2C_BUFF = reg;
 
     while (I2CnTransmit || (I2CBusy)) 
         if ( I2CTimeout > I2CMaxTimeout )  return I2CRegaddFail;
+}
+
+char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
+{
+    I2CTimeout = 0;
+    char len =0, error;
+    
+    error = I2C_Op_Reg( opcode, regadd);
+    if (error) return error;
     
     while (length > len)
     {
