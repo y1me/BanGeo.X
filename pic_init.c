@@ -45,8 +45,8 @@ void I2C_Init(void)  //init I2C Bus
     SSP1ADD = 0x13; // 400KHz
     SSP1CON1bits.SSPM = 8;
     SSP1CON1bits.CKP = 1;
-    SSP1CON3bits.SCIE = 1;
-    SSP1CON3bits.PCIE = 1;
+    SSP1CON3bits.SCIE = 0;
+    SSP1CON3bits.PCIE = 0;
     //I2C Bus pin
     ANSELAbits.ANSA2 = 0;
     ANSELAbits.ANSA4 = 0;

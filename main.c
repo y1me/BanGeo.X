@@ -118,11 +118,11 @@ void main(void)
     char test3[] = { 0x00, 0x00, 0x00};
     char test4[] = { 0x00, 0x00, 0x00};
     char error;
-    while (1) {
-        error = I2C_Write(0x27, 0x00, test, 4);
+    error = I2C_Write(0x27, 0x00, test, 4);
+    while (1) {        
         error = I2C_Write(0x27, 0x09, test2, 1);
         error = I2C_Write(0x27, 0x09, test3, 1);
-        //error = I2C_Read(0x27, 0x00, test4, 3);
+        error = I2C_Read(0x27, 0x00, test4, 3);
         
 
         
