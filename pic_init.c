@@ -79,12 +79,12 @@ void USART_Init(void)  //init USART
     TX1STAbits.TX9 = 0;
     TX1STAbits.SYNC = 0;
     TX1STAbits.SENDB = 0;
-    TX1STAbits.BRGH = 1; // a voir
+    TX1STAbits.BRGH = 1; 
     
     RC1STAbits.RX9 = 0;
-    BAUD1CONbits.BRG16 = 1;// a voir
-    SP1BRGH = 0;// a voir
-    SP1BRGL = 86;// a voir
+    BAUD1CONbits.BRG16 = 1;
+    SP1BRGH = 3;// a voir
+    SP1BRGL = 40;// 9600 : 0x340, 115200 : 0x44 
     
     RC1STAbits.CREN = 1;
     TX1STAbits.TXEN = 1;
