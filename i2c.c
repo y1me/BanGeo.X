@@ -65,17 +65,22 @@ char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
 char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
 {
     I2CTimeout = 0;
-    char len =0, error;
+    char len = 0, error;
     
     error = I2C_Op_Reg( opcode, regadd);
     if (error) return error;
     
-    I2C_Restart = 1;
+      I2C_Stop = 1;
     
     while (I2CnTransmit || (I2CBusy)) 
-    {
-            if ( I2CTimeout > I2CMaxTimeout )  return I2CRestartFail;
+            if ( I2CTimeout > I2CMaxTimeout )  return I2CStopFail;
+    
+    I2C_Start = 1;             //Initiate start condition
+    
+    while (I2CnTransmit || (I2CBusy)) {
+            if ( I2CTimeout > I2CMaxTimeout )  return I2CStartFail;
     }
+    
     I2C_BUFF = (opcode << 1 | I2C_R_Bit);
     
     while (I2CnTransmit || (I2CBusy))
@@ -87,24 +92,21 @@ char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
         len++;
         I2C_Reicv = 1;
 
-        while (I2CnTransmit || (I2CBusy) || !SSP1STATbits.BF) 
+        while (I2CnTransmit || (I2CBusy) /*|| !SSP1STATbits.BF*/) 
                 if ( I2CTimeout > I2CMaxTimeout )  return I2CReicvFail;
         
         *pdata = I2C_BUFF;
-        SSP1STATbits.BF = 0;
         *pdata++;
-
+        if (length == len) I2C_ACKDT = 1;
         I2C_ACKEN = 1; 
         while (I2CnTransmit || (I2CBusy)) 
                 if ( I2CTimeout > I2CMaxTimeout )  return I2CAcknFail;
     }
- 
+    I2C_ACKDT = 0;
     I2C_Stop = 1;
     
-    while (I2CnTransmit || I2C_Stop); 
-            //if ( I2CTimeout > I2CMaxTimeout )  return I2CStopFail;
-    SSP1CON1bits.SSPEN = 0;
-    SSP1CON1bits.SSPEN = 1;
+    while (I2CnTransmit || (I2CBusy)) 
+            if ( I2CTimeout > I2CMaxTimeout )  return I2CStopFail;
     return 0;
 }
 
