@@ -42,13 +42,13 @@
 
            
     /** EUSART ************************************************************/   
-    #define UART_TX_INT_F   PIR3bits.TX2IF
-    #define TX_UART_REG     TXREG2
-    #define TX_UART_INT_E   PIE3bits.TX2IE
-    #define UART_RX_INT_F   PIR3bits.RC2IF
-    #define RX_UART_REG     RCREG2
-    #define UART_RX_OERR    RCSTA2bits.OERR
-    #define UART_RX_EN      RCSTA2bits.CREN
+    #define UART_TX_INT_F   PIR1bits.TXIF
+    #define TX_UART_REG     TX1REG
+    #define TX_UART_INT_E   PIE1bits.TXIE
+    #define UART_RX_INT_F   PIR1bits.RCIF
+    #define RX_UART_REG     RC1REG
+    #define UART_RX_OERR    RC1STAbits.OERR
+    #define UART_RX_EN      RC1STAbits.CREN
 
     /** Timer telecommande ************************************************************/
 
@@ -66,9 +66,9 @@
 
     /** Timer Display ************************************************************/
 
- 	#define TIMDSPY_INT_F           TMR2IF
-	#define TIMERDSPY_REG           TMR2
-	#define EN_TIMDSPY              TMR2ON
+ 	#define TIM_PWM_INT_F           TMR2IF
+	#define TIM_PWM_REG             TMR2
+	#define EN_TIM_PWM              TMR2ON
 
     /** External Int1 ****************************************************/
 

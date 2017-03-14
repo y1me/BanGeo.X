@@ -25,6 +25,7 @@
 #define I2C_Start             SSP1CON2bits.SEN
 #define I2C_BUFF              SSP1BUF
 #define I2C_INT_F             PIR1bits.SSP1IF
+#define I2C_BF                SSP1STATbits.BF
 #define I2C_W_Bit             0xFE
 #define I2C_R_Bit             0x01
 

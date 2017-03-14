@@ -44,7 +44,7 @@
 
 
 volatile struct chbits{
-						unsigned spi:1; 
+						unsigned RxUart:1; 
 						unsigned tim0:1; 
 						unsigned int1:1; 
 						unsigned tim1:1; 
@@ -69,33 +69,67 @@ volatile struct chbitsalt{
 
 extern int I2CTimeout;
 
+volatile char RX_BUFF[32];
+volatile char TX_BUFF[32]= "dvdvxcxcvxv";
+volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
+
                     
 void interrupt ISR(void)
 {
-    if(INTCONbits.PEIE == 1 && PIE1bits.TMR2IE == 1 && PIR1bits.TMR2IF == 1)
+    if(TIM_PWM_INT_F)
     {
-        TMR2 = 0x00;
-        PIR1bits.TMR2IF = 0;
+        TIM_PWM_REG = 0x00;
+        TIM_PWM_INT_F = 0;
         I2CTimeout++;
     }
+    
+    if(UART_TX_INT_F && TX_UART_INT_E)
+    {
+        *pTX_W++;
+        TX_UART_REG = *pTX_W;
+        if ( pTX_W == pTX_stop ) {
+            TX_UART_INT_E = 0;
+            pTX_W = &TX_BUFF[0];
+        }
+    }
+            
+    if(UART_RX_INT_F)
+    {
+        *pRX_W = RX_UART_REG;
+        if (RX_BUFF[0] == 'O' || RX_BUFF[0] == 'C') *pRX_W++;
+        if ( (&RX_BUFF[31] == pRX_W) ) pRX_W = &RX_BUFF[0];
+        if ( *pRX_W == '\n' ){ 
+            pRX_W = &RX_BUFF[0];
+            flag.RxUart = 1;
+        }
+        
+    }
+    
 
 }
+
+
+    
 
 volatile int i,z;
 
 void main(void)
 {
     // initialize the device
-    i=0;
-    VOFFCHG = 0; //Shutdown charger
     pps_init();
     Port_Init();
     INT_Init();
     I2C_Init();
     Timer2_Init();
     PWM_Init();
-       
-    flag.spi = 0; 
+    USART_Init();
+    // initialize variables
+    pRX_W = &RX_BUFF[0];
+    pTX_stop = &TX_BUFF[0];
+    pTX_W = &TX_BUFF[0]; 
+    i=0;
+    VOFFCHG = 0; //Shutdown charger
+    flag.RxUart = 0; 
 	flag.tim0 = 0; 
 	flag.int1 = 0; 
 	flag.tim1 = 0; 
@@ -117,7 +151,7 @@ void main(void)
     char test2[] = { 0xFF, 0xFF, 0xFF};
     char test3[] = { 0x00, 0x00, 0x00};
     char test4[] = { 0x00, 0x00, 0x00};
-    char error;
+    
     error = I2C_Write(0x27, 0x00, test, 4);
     while (1) {        
         error = I2C_Write(0x27, 0x09, test2, 1);

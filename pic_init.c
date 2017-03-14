@@ -8,12 +8,14 @@
 /************************************************************************
 *						PIC INIT        								*
 ************************************************************************/
-void Port_Init(void)  //init i/o PIC for enable DAC
+void Port_Init(void)  //init i/o 
 {
     //Set/Unset analog pin
 
     ANSELAbits.ANSA5 = 0;
     ANSELCbits.ANSC3 = 0;
+    ANSELCbits.ANSC4 = 0;
+    ANSELCbits.ANSC5 = 0;
     TRISCbits.TRISC3 = OUTPUT_PIN;
     TRISAbits.TRISA5 = OUTPUT_PIN;
     TRISAbits.TRISA4 = INPUT_PIN;
@@ -69,24 +71,24 @@ PWM5DCL = 0x80;
 
 void USART_Init(void)  //init USART
 {
-    /*
-    RCSTA2bits.SPEN = 1;
-    TRISGbits.RG2 = 1;
-    TRISGbits.RG1 = 0;
     
-    TXSTA2bits.TX9 = 0;
-    TXSTA2bits.SYNC = 0;
-    TXSTA2bits.SENDB = 0;
-    TXSTA2bits.BRGH = 1;
+    RC1STAbits.SPEN = 1;
+    TRISCbits.TRISC4 = 1;
+    TRISCbits.TRISC5 = 0;
     
-    RCSTA2bits.RX9 = 0;
-    BAUDCON2bits.BRG16 = 1;
-    SPBRGH2 = 0;
-    SPBRG2 = 86;
+    TX1STAbits.TX9 = 0;
+    TX1STAbits.SYNC = 0;
+    TX1STAbits.SENDB = 0;
+    TX1STAbits.BRGH = 1; // a voir
     
-    RCSTA2bits.CREN = 1;
-    TXSTA2bits.TXEN = 1;
-    */
+    RC1STAbits.RX9 = 0;
+    BAUD1CONbits.BRG16 = 1;// a voir
+    SP1BRGH = 0;// a voir
+    SP1BRGL = 86;// a voir
+    
+    RC1STAbits.CREN = 1;
+    TX1STAbits.TXEN = 1;
+    
 }
 
 void INT_Init(void)  //init Interrupt
@@ -97,6 +99,12 @@ void INT_Init(void)  //init Interrupt
     // INT Reg control
     INTCONbits.GIE = 1;
     INTCONbits.PEIE = 1;
+    
+    //UART interrupt
+    PIE1bits.TXIE = 0;
+    
+    PIE1bits.RCIE = 1;
+ 
     /*
 	RCONbits.IINTCONPEN = 1;
 	
@@ -115,13 +123,7 @@ void INT_Init(void)  //init Interrupt
 	PIR1bits.SSP1IF = 0;
 	PIE1bits.SSP1IE = 1;
     
-    //UART interrupt
-    
-    PIE3bits.TX2IE = 0;
-    IPR3bits.TX2IP = 0;
-    
-    PIE3bits.RC2IE = 1;
-    IPR3bits.RC2IP = 1;   
+  
 */
 }
 
