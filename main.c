@@ -122,6 +122,7 @@ void main(void)
     I2C_Init();
     Timer2_Init();
     PWM_Init();
+    ADC_Init();
     USART_Init();
     // initialize variables
     pRX_W = &RX_BUFF[0];

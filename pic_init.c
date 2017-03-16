@@ -27,6 +27,9 @@ void pps_init(void) {
   PPSLOCK = 0x55;
   PPSLOCK = 0xaa;
   PPSLOCKbits.PPSLOCKED = 0;		// unlock PPS
+  /*****EUSART*****/
+  RXPPSbits.RXPPS = 0x15;   //RC5->EUSART:RX;
+  RC4PPSbits.RC4PPS = 0x14;   //RC4->EUSART:TX;
   /*****I2C*****/
   RA2PPSbits.RA2PPS = 0x18; //SCK
   RA4PPSbits.RA4PPS = 0x19; //SDA
@@ -67,6 +70,73 @@ void PWM_Init(void)  //init PWM
 PWM5DCH = 0x04;
 PWM5DCL = 0x80;
 
+}
+
+void ADC_Init(void)  //init ADC
+{
+    // Init Fixed Voltage Ref
+    FVRCONbits.ADFVR = 3;
+    FVRCONbits.FVREN = 1;
+    
+    //ADC Conf
+    // ADGO stop; ADON enabled; CHS ANA4; 
+    ADCON0 = 0x11;
+    
+    // ADFM left; ADNREF VSS; ADPREF FVR; ADCS FOSC/64; 
+    ADCON1 = 0x63;
+    
+    // ADACT no_auto_trigger; 
+    ADACT = 0x00;
+ /*   
+    void ADC_SelectChannel(adc_channel_t channel)
+{
+    // select the A/D channel
+    ADCON0bits.CHS = channel;    
+    // Turn on the ADC module
+    ADCON0bits.ADON = 1;  
+}
+
+void ADC_StartConversion()
+{
+    // Start the conversion
+    ADCON0bits.ADGO = 1;
+}
+
+
+bool ADC_IsConversionDone()
+{
+    // Start the conversion
+    return (!ADCON0bits.ADGO);
+}
+
+adc_result_t ADC_GetConversionResult(void)
+{
+    // Conversion finished, return the result
+    return ((ADRESH << 8) + ADRESL);
+}
+
+adc_result_t ADC_GetConversion(adc_channel_t channel)
+{
+    // select the A/D channel
+    ADCON0bits.CHS = channel;    
+
+    // Turn on the ADC module
+    ADCON0bits.ADON = 1;
+    // Acquisition time delay
+    __delay_us(ACQ_US_DELAY);
+
+    // Start the conversion
+    ADCON0bits.ADGO = 1;
+
+    // Wait for the conversion to finish
+    while (ADCON0bits.ADGO)
+    {
+    }
+    // Conversion finished, return the result
+    return ((ADRESH << 8) + ADRESL);
+
+}
+*/
 }
 
 void USART_Init(void)  //init USART
