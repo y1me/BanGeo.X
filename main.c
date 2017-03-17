@@ -39,14 +39,12 @@
 #include <string.h>
 #include "./h/pic_init.h"
 #include "./h/hwprofile.h"
-#include "./h/i2c.h"
-
-
+#include "./h/user.h"
 
 volatile struct chbits{
 						unsigned RxUart:1; 
-						unsigned tim0:1; 
-						unsigned int1:1; 
+						unsigned TxUart:1; 
+						unsigned I2c_Init:1; 
 						unsigned tim1:1; 
 						unsigned Dtime:1; 
 						unsigned Data1:1; 
@@ -91,6 +89,7 @@ void interrupt ISR(void)
             TX_UART_INT_E = 0;
             pTX_W = &TX_BUFF[0];
         }
+        UART_TX_INT_F = 0;
     }
             
     if(UART_RX_INT_F)
@@ -102,6 +101,7 @@ void interrupt ISR(void)
             pRX_W = &RX_BUFF[0];
             flag.RxUart = 1;
         }
+        UART_RX_INT_F = 0;
         
     }
     
@@ -131,8 +131,8 @@ void main(void)
     i=0;
     VOFFCHG = 0; //Shutdown charger
     flag.RxUart = 0; 
-	flag.tim0 = 0; 
-	flag.int1 = 0; 
+	flag.TxUart = 0; 
+	flag.I2c_Init = 0; 
 	flag.tim1 = 0; 
 	flag.Dtime = 0; 
 	flag.Data1 = 0; 
@@ -148,19 +148,8 @@ void main(void)
 	flagalt.free3 = 0;
 	flagalt.bit7 = 0;
     
-    char test[] = { 0x00, 0x00, 0x00, 0x00};
-    char test2[] = { 0xFF, 0xFF, 0xFF};
-    char test3[] = { 0x00, 0x00, 0x00};
-    char test4[] = { 0x00, 0x00, 0x00};
-    
-    error = I2C_Write(0x27, 0x00, test, 4);
     while (1) {        
-        error = I2C_Write(0x27, 0x09, test2, 1);
-        error = I2C_Write(0x27, 0x09, test3, 1);
-        error = I2C_Read(0x27, 0x00, test4, 3);
-        
-
-        
+        ProcessIO();
     }
 
 }

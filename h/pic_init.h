@@ -2,7 +2,7 @@
 #define PIC_INIT_H
 
 
-/***************** PIC FUNCTIONS PROTOYPES *********************/
+/***************** PIC INIT FUNCTIONS PROTOYPES *********************/
 void Port_Init(void);
 void pps_init(void);
 void I2C_Init(void);

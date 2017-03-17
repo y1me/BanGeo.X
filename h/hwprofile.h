@@ -2,6 +2,9 @@
 
 
     #define HARDWARE_PROFILE_H
+
+    #define CLOCK_FREQ          32000000
+
 /** DEBUG ***********************************************************/
     #define I2CFreeBusFail      0x01        
     #define I2CStartFail        0x02
@@ -13,27 +16,23 @@
     #define I2CReicvFail        0x08
     #define I2CAcknFail         0x10
 
-
-
-
-    #define CLOCK_FREQ          32000000
-    #define Time_info           20000
-    #define Scan_time           70 //x * 0.01s
-    #define Nb_Retry            50000
-    #define SPI_DATA_SIZE       20
-    #define DISPLAY_DATA_SIZE   16
-
-
 /** DEBUG ***********************************************************/
-	#define	TRIS_PORTTEST		TRISC7
-	#define PORTTEST            PORTCbits.RC0
-    #define PORTTEST2           PORTCbits.RC1
+	#define	TRIS_PORTTEST		
+	#define PORTTEST            
+    #define PORTTEST2           
 
 /** TRIS ***********************************************************/
 	#define INPUT_PIN           1
 	#define OUTPUT_PIN          0
 	#define INPUT_PORT          0xFF
 	#define OUTPUT_PORT         0x00
+
+/** I2C MCP23008 ***********************************************************/
+	#define ADD_IOEXP           0x27
+	#define IODIR_IOEXP         0x00
+	#define GPIO_IOEXP          0x09
+
+
 
 /** BATTERY CHARGER ***********************************************************/
 	#define VOFFCHG             PORTAbits.RA5
@@ -50,30 +49,10 @@
     #define UART_RX_OERR    RC1STAbits.OERR
     #define UART_RX_EN      RC1STAbits.CREN
 
-    /** Timer telecommande ************************************************************/
-
- 	#define TIMIR_INT_F         TMR1IF
-	#define TIMERIR_REGH        TMR1H
-	#define TIMERIR_REG         TMR1L
-	#define EN_TIMIR            TMR1ON
-
-    /** Timer SubChannel ************************************************************/
-
- 	#define TIMSUB_INT_F            TMR0IF
-	#define TIMERSUB_REGH           TMR0H
-	#define TIMERSUB_REG            TMR0L
-	#define EN_TIMSUB               TMR0ON
-
     /** Timer Display ************************************************************/
 
  	#define TIM_PWM_INT_F           TMR2IF
 	#define TIM_PWM_REG             TMR2
 	#define EN_TIM_PWM              TMR2ON
-
-    /** External Int1 ****************************************************/
-
- 	#define INT1_INT_F		INT1IF
-	#define INPUT_IR		PORTBbits.RB1
-	#define EN_INT1			INT1IE
 
  #endif  //HARDWARE_PROFILE_H
