@@ -70,16 +70,11 @@ char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
     error = I2C_Op_Reg( opcode, regadd);
     if (error) return error;
     
-      I2C_Stop = 1;
-    
-    while (I2CnTransmit || (I2CBusy)) 
-            if ( I2CTimeout > I2CMaxTimeout )  return I2CStopFail;
-    
-    I2C_Start = 1;             //Initiate start condition
+    I2C_Restart = 1;
     
     while (I2CnTransmit || (I2CBusy)) {
-            if ( I2CTimeout > I2CMaxTimeout )  return I2CStartFail;
-    }
+            if ( I2CTimeout > I2CMaxTimeout )  return I2CRestartFail;
+}
     
     I2C_BUFF = (opcode << 1 | I2C_R_Bit);
     

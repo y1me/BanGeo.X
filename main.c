@@ -114,18 +114,24 @@ void main(void)
 	flagalt.bit7 = 0;
     
     char test[] = { 0x00, 0x00, 0x00, 0x00};
-    char test2[] = { 0x00, 0xFF, 0xFF};
+    char test2[] = { 0xAC, 0xFF, 0xFF};
     char test3[] = { 0xC8, 0xAC, 0xAC};
-    char test4[16] = { 0x00, 0x00, 0x00};
+    char data = 0x0c;
     char error;
     error = I2C_Write(0x27, 0x00, test, 4);
-    while (1) {        
-        error = I2C_Write(0x27, 0x05, test2, 1);
-        error = I2C_Write(0x27, 0x09, test3, 1);
-        error = I2C_Read(0x27, 0x09, &test4[0], 2);
-        
-
-        
+    while (1) {
+        data = 0x0c;
+        error = I2C_Write(0x27, 0x00, &data, 1); 
+        error = I2C_Read(0x27, 0x00, &data, 1);
+        data = 0xC3;
+        error = I2C_Write(0x27, 0x09, &data, 1);
+        error = I2C_Read(0x27, 0x09, &data, 1);
+        data = 0x04;
+        error = I2C_Write(0x27, 0x00, &data, 1);
+        error = I2C_Read(0x27, 0x00, &data, 1);
+        data = 0x08;
+        error = I2C_Write(0x27, 0x00, &data, 1);
+        error = I2C_Read(0x27, 0x00, &data, 1);   
     }
 
 }
