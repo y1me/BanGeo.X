@@ -31,9 +31,10 @@
 	#define ADD_IOEXP           0x27
 	#define IODIR_IOEXP         0x00
 	#define GPIO_IOEXP          0x09
-
-
-
+/** I2C ADS1115 ***********************************************************/
+	#define ADD_ADS             0x49
+	#define CFG_ADS             0x01
+	#define CONV_ADS            0x00
 /** BATTERY CHARGER ***********************************************************/
 	#define VOFFCHG             PORTAbits.RA5
     #define VTEMP               PORTAbits.RA4
