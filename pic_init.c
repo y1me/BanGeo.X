@@ -79,14 +79,14 @@ void ADC_Init(void)  //init ADC
     FVRCONbits.FVREN = 1;
     
     //ADC Conf
-    // ADGO stop; ADON enabled; CHS ANA4; 
-    ADCON0 = 0x11;
-    
     // ADFM left; ADNREF VSS; ADPREF FVR; ADCS FOSC/64; 
-    ADCON1 = 0x63;
+    ADCON1 = 0xE3;
     
     // ADACT no_auto_trigger; 
     ADACT = 0x00;
+    
+    // ADGO stop; ADON enabled; CHS ANC0; 
+    ADCON0 = 0x41;
  /*   
     void ADC_SelectChannel(adc_channel_t channel)
 {

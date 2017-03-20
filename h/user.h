@@ -13,6 +13,9 @@
 #define AIN2            0x60
 #define AIN3            0x70
 
+#define temperature     0x10
+#define voltage         0x11
+
 #define CHG_n_MASK      0xF3
 #define CHG_MASK        0x0C
 #define MUX_n_MASK      0x8F

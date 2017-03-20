@@ -35,12 +35,14 @@
 	#define ADD_ADS             0x49
 	#define CFG_ADS             0x01
 	#define CONV_ADS            0x00
+/** ADC ***********************************************************/
+    #define ADC_MUX             ADCON0bits.CHS 
+    #define ADC_CONV            ADCON0bits.ADGO
+    #define ADC_H               ADRESH
+    #define ADC_L               ADRESL
 /** BATTERY CHARGER ***********************************************************/
 	#define VOFFCHG             PORTAbits.RA5
-    #define VTEMP               PORTAbits.RA4
-    
-
-           
+    #define VTEMP               PORTAbits.RA4       
     /** EUSART ************************************************************/   
     #define UART_TX_INT_F   PIR1bits.TXIF
     #define TX_UART_REG     TX1REG

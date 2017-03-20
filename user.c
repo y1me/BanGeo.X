@@ -44,6 +44,13 @@ void SetCharge(char cfg)
     error = I2C_Write(ADD_IOEXP, IODIR_IOEXP, &data, 1);  
 }
 
+void SetLed(char cfg)
+{
+    // valid input value : any 
+    cfg &= CHG_n_MASK; 
+    error = I2C_Write(ADD_IOEXP, GPIO_IOEXP, &cfg, 1);  
+}
+
 void SetMux(char cfg)
 {
     // valid input value : FAST_CHG, TAIL_CHG, PRE_CHG 
@@ -70,6 +77,29 @@ int Getconv(void)
     return conv; 
 }
 
+void SetTempMux(void)
+{
+    ADC_MUX = temperature;
+}
+
+void SetVbattMux(void)
+{
+    ADC_MUX = voltage;   
+}
+
+int GetADC(void)
+{
+    int conv;
+    ADC_CONV = 1;
+    while (ADC_CONV);
+    conv = ADC_H;
+    conv = conv << 8;
+    conv |= ADC_L;
+    return conv;
+}
+
+
+
 void Startconv(void)
 {
     // valid input value : AIN0,AIN1,AIN2,AIN3 
@@ -94,5 +124,10 @@ void ProcessIO(void)
         SetMux(0x70);
         Getconv();
         Startconv();
+        SetTempMux();
+        SetVbattMux();
+        GetADC();     
+        SetLed(0xAA);
+        
 }
 
