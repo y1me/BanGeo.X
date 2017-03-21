@@ -34,6 +34,7 @@ char I2C_Op_Reg( uint8_t op, uint8_t reg)
     {
         if ( I2CTimeout > I2CMaxTimeout )  return I2CRegaddFail;
     }
+    return 0;
 }
 
 char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
