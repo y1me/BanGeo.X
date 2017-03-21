@@ -114,11 +114,13 @@ void main(void)
 	flagalt.free3 = 0;
 	flagalt.bit7 = 0;
     
+    
     char error;
     while (1) {
         error = I2C_Read(0x49, 0x01, &test[0], 2);
         error = I2C_Read(0x49, 0x02, &test[0], 2);
         error = I2C_Read(0x49, 0x03, &test[0], 2);
+        error = I2C_Read(0x49, 0x00, &test[0], 2);
     }
 
 }
