@@ -67,7 +67,7 @@ char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
 {
     I2CTimeout = 0;
     char len = 0, error,i = 0;
-    char debug[2];
+    char debug[10];
     
     error = I2C_Op_Reg( opcode, regadd);
     if (error) return error;
@@ -97,11 +97,12 @@ char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
                 if ( I2CTimeout > I2CMaxTimeout )  return I2CReicvFail;
         }
         
-        *pdata = I2C_BUFF;  
-        debug[i] =  *pdata;
+        debug[i] = I2C_BUFF;  
+        *pdata = debug[i];
         *pdata++;
         I2C_BF = 0;
-        
+        i++;
+        if (i > 10) i = 0;
         if (length == len) I2C_ACKDT = 1;
         I2C_ACKEN = 1; 
         while (I2CnTransmit || (I2CBusy)) 
