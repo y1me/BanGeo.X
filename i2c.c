@@ -92,14 +92,14 @@ char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
                 if ( I2CTimeout > I2CMaxTimeout )  return I2CReicvFail;
         }
         
-        while(!SSP1STATbits.BF) {  
+        while(!I2C_BF) {  
                 if ( I2CTimeout > I2CMaxTimeout )  return I2CReicvFail;
         }
         
         *pdata = I2C_BUFF;
         debug[len] =  *pdata;
         *pdata++;
-        
+        I2C_BF = 0;
         
         if (length == len) I2C_ACKDT = 1;
         I2C_ACKEN = 1; 
