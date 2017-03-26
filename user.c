@@ -14,7 +14,8 @@ extern volatile struct chbits{
 		
 					}flag ;
 
-volatile char error = 0;                   
+volatile char error = 0;  
+volatile uint8_t test[10];
 
 void InitI2cChip(void)
 {
@@ -80,11 +81,13 @@ int Getconv(void)
 void SetTempMux(void)
 {
     ADC_MUX = temperature;
+    // to modifie, not working
 }
 
 void SetVbattMux(void)
 {
     ADC_MUX = voltage;   
+    // to modifie, not working
 }
 
 int GetADC(void)
@@ -111,6 +114,7 @@ void Startconv(void)
 
 void ProcessIO(void)
 {
+    /*
     if (!flag.I2c_Init)
     {
         InitI2cChip();
@@ -128,6 +132,8 @@ void ProcessIO(void)
         SetVbattMux();
         GetADC();     
         SetLed(0xAA);
-        
+    */
+error = I2C_Read(0x49, 0x02, &test[0], 2);
+    
 }
 

@@ -36,7 +36,7 @@
 	#define CFG_ADS             0x01
 	#define CONV_ADS            0x00
 /** ADC ***********************************************************/
-    #define ADC_MUX             ADCON0bits.CHS 
+    #define ADC_MUX             ADCON0 
     #define ADC_CONV            ADCON0bits.ADGO
     #define ADC_H               ADRESH
     #define ADC_L               ADRESL
