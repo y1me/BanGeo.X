@@ -77,35 +77,46 @@ void interrupt ISR(void)
 {
     if(TIM_PWM_INT_F)
     {
-        TIM_PWM_REG = 0x00;
+        TIM_PWM_REG = 0x01;
         TIM_PWM_INT_F = 0;
         I2CTimeout++;
     }
-    
-    if(UART_TX_INT_F && TX_UART_INT_E)
+    else
     {
-        *pTX_W++;
-        TX_UART_REG = *pTX_W;
-        if ( pTX_W == pTX_stop ) {
-            TX_UART_INT_E = 0;
-            pTX_W = &TX_BUFF[0];
+
+        if(UART_TX_INT_F && TX_UART_INT_E)
+        {
+            *pTX_W++;
+            TX_UART_REG = *pTX_W;
+            if ( pTX_W == pTX_stop ) {
+                TX_UART_INT_E = 0;
+                pTX_W = &TX_BUFF[0];
+            }
+            UART_TX_INT_F = 0;
         }
-        UART_TX_INT_F = 0;
-    }
-            
-    if(UART_RX_INT_F)
-    {
-        *pRX_W = RX_UART_REG;
-        if (RX_BUFF[0] == 'O' || RX_BUFF[0] == 'C') *pRX_W++;
-        if ( (&RX_BUFF[31] == pRX_W) ) pRX_W = &RX_BUFF[0];
-        if ( *pRX_W == '\n' ){ 
-            pRX_W = &RX_BUFF[0];
-            flag.RxUart = 1;
+
+        if(UART_RX_INT_F)
+        {
+            *pRX_W = RX_UART_REG;
+            if (RX_BUFF[0] == 'O' || RX_BUFF[0] == 'C') *pRX_W++;
+            if ( (&RX_BUFF[31] == pRX_W) ) pRX_W = &RX_BUFF[0];
+            if ( *pRX_W == '\n' ){ 
+                pRX_W = &RX_BUFF[0];
+                flag.RxUart = 1;
+            }
+            UART_RX_INT_F = 0;
+
         }
-        UART_RX_INT_F = 0;
-        
+        if(PIR0bits.INTF) {
+            PIR0bits.INTF = 0;
+        } 
+        if(PIR1bits.TMR1GIF) {
+            PIR1bits.TMR1GIF = 0;
+        }
+        if(PIR2bits.NVMIF) {
+            PIR2bits.NVMIF = 0;
+        }
     }
-    
 
 }
 

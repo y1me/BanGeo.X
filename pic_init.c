@@ -82,61 +82,9 @@ void ADC_Init(void)  //init ADC
     // ADFM left; ADNREF VSS; ADPREF FVR; ADCS FOSC/64; 
     ADCON1 = 0xE3;
     
-    // ADACT no_auto_trigger; 
     ADACT = 0x00;
-    
     // ADGO stop; ADON enabled; CHS ANC0; 
     ADCON0 = 0x41;
- /*   
-    void ADC_SelectChannel(adc_channel_t channel)
-{
-    // select the A/D channel
-    ADCON0bits.CHS = channel;    
-    // Turn on the ADC module
-    ADCON0bits.ADON = 1;  
-}
-
-void ADC_StartConversion()
-{
-    // Start the conversion
-    ADCON0bits.ADGO = 1;
-}
-
-
-bool ADC_IsConversionDone()
-{
-    // Start the conversion
-    return (!ADCON0bits.ADGO);
-}
-
-adc_result_t ADC_GetConversionResult(void)
-{
-    // Conversion finished, return the result
-    return ((ADRESH << 8) + ADRESL);
-}
-
-adc_result_t ADC_GetConversion(adc_channel_t channel)
-{
-    // select the A/D channel
-    ADCON0bits.CHS = channel;    
-
-    // Turn on the ADC module
-    ADCON0bits.ADON = 1;
-    // Acquisition time delay
-    __delay_us(ACQ_US_DELAY);
-
-    // Start the conversion
-    ADCON0bits.ADGO = 1;
-
-    // Wait for the conversion to finish
-    while (ADCON0bits.ADGO)
-    {
-    }
-    // Conversion finished, return the result
-    return ((ADRESH << 8) + ADRESL);
-
-}
-*/
 }
 
 void USART_Init(void)  //init USART
@@ -173,7 +121,7 @@ void INT_Init(void)  //init Interrupt
     //UART interrupt
     PIE1bits.TXIE = 0;
     
-    PIE1bits.RCIE = 1;
+    //PIE1bits.RCIE = 1;
  
     /*
 	RCONbits.IINTCONPEN = 1;
@@ -235,6 +183,7 @@ void Timer2_Init(void)  //init timer2
     T2CON = 0x00;
     PR2 = 0x0F;
     TMR2 = 0x00;
+
     // Clearing IF flag before enabling the interrupt.
 PIR1bits.TMR2IF = 0;
 PIE1bits.TMR2IE = 1;

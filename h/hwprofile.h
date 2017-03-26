@@ -54,7 +54,7 @@
 
     /** Timer Display ************************************************************/
 
- 	#define TIM_PWM_INT_F           TMR2IF
+ 	#define TIM_PWM_INT_F           PIR1bits.TMR2IF
 	#define TIM_PWM_REG             TMR2
 	#define EN_TIM_PWM              TMR2ON
 

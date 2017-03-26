@@ -133,7 +133,7 @@ void ProcessIO(void)
         GetADC();     
         SetLed(0xAA);
     */
-error = I2C_Read(0x49, 0x02, &test[0], 2);
+error = I2C_Read(0x49, 0x01, &test[0], 2);
     
 }
 
