@@ -28,6 +28,7 @@
 #define I2C_BF                SSP1STATbits.BF
 #define I2C_W_Bit             0xFE
 #define I2C_R_Bit             0x01
+#define I2C_BF                SSP1STATbits.BF
 
 
     char I2C_Write(

@@ -65,6 +65,7 @@ volatile struct chbitsalt{
 
 					}flagalt ;
 
+volatile char test[10];                    
 extern int I2CTimeout;
 
 volatile char RX_BUFF[32];

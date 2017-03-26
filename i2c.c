@@ -64,7 +64,8 @@ char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
 char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
 {
     I2CTimeout = 0;
-    char len =0, error;
+    char len = 0, error,i = 0;
+    char debug[2];
     
     error = I2C_Op_Reg( opcode, regadd);
     if (error) return error;
@@ -74,6 +75,7 @@ char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
     while (I2CnTransmit || (I2CBusy)) {
             if ( I2CTimeout > I2CMaxTimeout )  return I2CRestartFail;
     }
+    
     I2C_BUFF = (opcode << 1 | I2C_R_Bit);
     
     while (I2CnTransmit || (I2CBusy) || I2C_ACKSTAT) {
@@ -84,24 +86,30 @@ char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
         len++;
         I2C_Reicv = 1;
 
-        while (I2CnTransmit || (I2CBusy) || !I2C_BF) {  
+        while (I2CnTransmit || (I2CBusy)) {  
                 if ( I2CTimeout > I2CMaxTimeout )  return I2CReicvFail;
         }
         
-        *pdata = I2C_BUFF;     
+        while(!I2C_BF) {  
+                if ( I2CTimeout > I2CMaxTimeout )  return I2CReicvFail;
+        }
+        
+        *pdata = I2C_BUFF;  
+        debug[i] =  *pdata;
         *pdata++;
-        I2C_ACKDT = 0;
+        I2C_BF = 0;
+        
+        if (length == len) I2C_ACKDT = 1;
         I2C_ACKEN = 1; 
         while (I2CnTransmit || (I2CBusy) || I2C_ACKSTAT){ 
                 if ( I2CTimeout > I2CMaxTimeout )  return I2CAcknFail;
         }
     }
- 
+    I2C_ACKDT = 0;
     I2C_Stop = 1;
     
-    while (I2CnTransmit || I2C_Stop) { 
+    while (I2CnTransmit || (I2CBusy)) 
             if ( I2CTimeout > I2CMaxTimeout )  return I2CStopFail;
-    }
     return 0;
 }
 
