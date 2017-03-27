@@ -44,7 +44,7 @@
 volatile struct chbits{
 						unsigned RxUart:1; 
 						unsigned TxUart:1; 
-						unsigned I2c_Init:1; 
+						unsigned Sys_Init:1; 
 						unsigned tim1:1; 
 						unsigned Dtime:1; 
 						unsigned Data1:1; 
@@ -143,7 +143,7 @@ void main(void)
     VOFFCHG = 0; //Shutdown charger
     flag.RxUart = 0; 
 	flag.TxUart = 0; 
-	flag.I2c_Init = 0; 
+	flag.Sys_Init = 0; 
 	flag.tim1 = 0; 
 	flag.Dtime = 0; 
 	flag.Data1 = 0; 

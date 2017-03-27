@@ -7,6 +7,8 @@
 #define FAST_CHG        0x0C
 #define TAIL_CHG        0x00
 #define PRE_CHG         0x04
+#define V_PRE           3500
+#define V_TAIL          25000
 
 #define AIN0            0x40
 #define AIN1            0x50

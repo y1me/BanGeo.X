@@ -5,7 +5,7 @@
 extern volatile struct chbits{
 						unsigned RxUart:1; 
 						unsigned TxUart:1; 
-						unsigned I2c_Init:1; 
+						unsigned Sys_Init:1; 
 						unsigned tim1:1; 
 						unsigned Dtime:1; 
 						unsigned Data1:1; 
@@ -16,6 +16,7 @@ extern volatile struct chbits{
 
 volatile char error = 0;  
 volatile uint8_t test[10];
+volatile unsigned int Vbatt, Tbatt, loop = 0;
 extern volatile char RX_BUFF[32];
 extern volatile char TX_BUFF[32];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
@@ -31,6 +32,7 @@ void InitI2cChip(void)
     error = I2C_Read(ADD_IOEXP, IODIR_IOEXP, &data[0], 1);
     
     //ADS1115
+    error = I2C_Read(ADD_ADS, CFG_ADS, &test[0], 2);
     data[0] = 0x43;
     data[1] = 0x83;
     error = I2C_Write(ADD_ADS, CFG_ADS, &data[0], 2);
@@ -119,10 +121,11 @@ void Startconv(void)
 void ProcessIO(void)
 {
     
-    if (!flag.I2c_Init)
+    if (!flag.Sys_Init)
     {
         InitI2cChip();
-        flag.I2c_Init = 0;
+        //Init BLE
+        flag.Sys_Init = 1;
     }
     if (flag.RxUart)
     {
@@ -144,17 +147,40 @@ void ProcessIO(void)
                 case    'E':  // "CE*value*\n" set ADS1115 Mux, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70) 
                     SetMux(RX_BUFF[2]);
                   break;
-                case    'F': // "CF\n" set pic16 temperature mux 
-                    SetTempMux();
+                case    'F': // "CF\n" get battery voltage and temperature 
+                    /***********/
                   break;
-                case    'G': // "CG\n" set pic16 battery voltage mux 
-                    SetVbattMux();
+                case    'G': // "CG\n" get battery ADS Voltage 
+                    /***********/
+                  break;
+                case    'H': // "CH*value*\n" get and write ZERO calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
+                    /***********/
+                    SetMux(RX_BUFF[2]);
+                  break;
+                case    'I': // "CI*value*\n" get and write upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
+                    /***********/
+                    SetMux(RX_BUFF[2]);
+                  break;
+                case    'J': // "CI*value*\n" get and write lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
+                    /***********/
+                    SetMux(RX_BUFF[2]);
+                  break;
+                case    'K': // "CK*value*\n" return ZERO calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
+                    /***********/
+                  break;
+                case    'L': // "CL*value*\n" return upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
+                    /***********/
+                  break;
+                case    'M': // "CM*value*\n" return lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
+                    /***********/
+                  break;
+                case    'N': // "CN*value*\n" return lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
+                    Startconv();
+                    while (Getconv() == 0x8000);
                   break;
                 
-                    
                   
-                  
-                    
+
             }
         }
         RX_BUFF[0] = 0;
@@ -162,15 +188,27 @@ void ProcessIO(void)
         RX_BUFF[2] = 0;
         flag.RxUart = 0;
     }
-        SetMux(0x70);
-        Getconv();
-        Startconv();
+
+    if (loop == 100)
+    {
         SetTempMux();
+        Tbatt = GetADC();
         SetVbattMux();
-        GetADC();     
-        SetLed(0xAA);
+        Vbatt = GetADC();
+        if (Vbatt < V_PRE){
+            SetCharge(PRE_CHG);
+        }
+        else if (Vbatt < V_TAIL) {
+            SetCharge(FAST_CHG);
+        }
+        else {
+            SetCharge(TAIL_CHG);
+        }
+        loop = 0;
+    }
+    loop++;
     
-error = I2C_Read(0x49, 0x01, &test[0], 2);
+
     
 }
 
