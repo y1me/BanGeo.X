@@ -16,7 +16,7 @@ extern volatile struct chbits{
 
 volatile char error = 0;  
 volatile uint8_t test[10];
-volatile unsigned int Vbatt, Tbatt, loop = 0;
+volatile unsigned int ADSValue, Vbatt, Tbatt, loop = 0;
 extern volatile char RX_BUFF[32];
 extern volatile char TX_BUFF[32];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
@@ -148,22 +148,52 @@ void ProcessIO(void)
                     SetMux(RX_BUFF[2]);
                   break;
                 case    'F': // "CF\n" get battery voltage and temperature 
-                    /***********/
+                    TX_BUFF[0] = 'R';
+                    TX_BUFF[1] = 'F';
+                    TX_BUFF[2] = '2';
+                    TX_BUFF[3] = Tbatt;
+                    TX_BUFF[4] = (Tbatt >> 8);
+                    TX_BUFF[5] = '\n';
+                    while(TX_UART_INT_E);
+                    pTX_W = &TX_BUFF[0];
+                    pTX_stop = &TX_BUFF[5];
+                    TX_UART_INT_E = 1;
+                    TX_UART_REG = *pTX_W;
                   break;
                 case    'G': // "CG\n" get battery ADS Voltage 
-                    /***********/
+                    TX_BUFF[0] = 'R';
+                    TX_BUFF[1] = 'G';
+                    TX_BUFF[2] = '2';
+                    TX_BUFF[3] = Vbatt;
+                    TX_BUFF[4] = (Vbatt >> 8);
+                    TX_BUFF[5] = '\n';
+                    while(TX_UART_INT_E);
+                    pTX_W = &TX_BUFF[0];
+                    pTX_stop = &TX_BUFF[5];
+                    TX_UART_INT_E = 1;
+                    TX_UART_REG = *pTX_W;
+                    
                   break;
                 case    'H': // "CH*value*\n" get and write ZERO calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
                     /***********/
                     SetMux(RX_BUFF[2]);
+                    Startconv();
+                    while (Getconv() == 0x8000);
+                    ADSValue = Getconv();
                   break;
                 case    'I': // "CI*value*\n" get and write upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
                     /***********/
                     SetMux(RX_BUFF[2]);
+                    Startconv();
+                    while (Getconv() == 0x8000);
+                    ADSValue = Getconv();
                   break;
                 case    'J': // "CI*value*\n" get and write lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
                     /***********/
                     SetMux(RX_BUFF[2]);
+                    Startconv();
+                    while (Getconv() == 0x8000);
+                    ADSValue = Getconv();
                   break;
                 case    'K': // "CK*value*\n" return ZERO calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
                     /***********/
@@ -174,9 +204,24 @@ void ProcessIO(void)
                 case    'M': // "CM*value*\n" return lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
                     /***********/
                   break;
-                case    'N': // "CN*value*\n" return lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
+                case    'N': // "CN\n" return ADS Value on   
                     Startconv();
                     while (Getconv() == 0x8000);
+                    ADSValue = Getconv();
+                    TX_BUFF[0] = 'R';
+                    TX_BUFF[1] = 'N';
+                    TX_BUFF[2] = '2';
+                    TX_BUFF[3] = ADSValue;
+                    TX_BUFF[4] = (ADSValue >> 8);
+                    TX_BUFF[5] = '\n';
+                    while(TX_UART_INT_E);
+                    pTX_W = &TX_BUFF[0];
+                    pTX_stop = &TX_BUFF[5];
+                    TX_UART_INT_E = 1;
+                    TX_UART_REG = *pTX_W;
+                    
+                    
+                    
                   break;
                 
                   
