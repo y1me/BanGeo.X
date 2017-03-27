@@ -16,6 +16,9 @@ extern volatile struct chbits{
 
 volatile char error = 0;  
 volatile uint8_t test[10];
+extern volatile char RX_BUFF[32];
+extern volatile char TX_BUFF[32];
+extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
 
 void InitI2cChip(void)
 {
@@ -54,7 +57,7 @@ void SetLed(char cfg)
 
 void SetMux(char cfg)
 {
-    // valid input value : FAST_CHG, TAIL_CHG, PRE_CHG 
+    // valid input value : 0bx100xxxx, 0bx101xxxx, 0bx110xxxx, 0bx111xxxx
     char data[2];
     error = I2C_Read(ADD_ADS, CFG_ADS, &data[0], 2);
     data[0] &= MUX_n_MASK;
@@ -65,7 +68,7 @@ void SetMux(char cfg)
 
 int Getconv(void)
 {
-    // valid input value : return conversion value 
+    // return conversion value 
     char data[2];
     int conv = 0x8000;
     error = I2C_Read(ADD_ADS, CFG_ADS, &data[0], 2);
@@ -81,13 +84,11 @@ int Getconv(void)
 void SetTempMux(void)
 {
     ADC_MUX = temperature;
-    // to modifie, not working
 }
 
 void SetVbattMux(void)
 {
     ADC_MUX = voltage;   
-    // to modifie, not working
 }
 
 int GetADC(void)
@@ -107,14 +108,17 @@ void Startconv(void)
 {
     // valid input value : AIN0,AIN1,AIN2,AIN3 
     char data[2];
-    error = I2C_Read(ADD_ADS, CFG_ADS, &data[0], 2);
+    data[0] = 0x80;
+    while (data[0] > 0x80) {
+        error = I2C_Read(ADD_ADS, CFG_ADS, &data[0], 2);
+    }
     data[0] |= CONV_MASK; 
     error = I2C_Write(ADD_ADS, CFG_ADS, &data[0], 2); 
 }
 
 void ProcessIO(void)
 {
-    /*
+    
     if (!flag.I2c_Init)
     {
         InitI2cChip();
@@ -122,7 +126,40 @@ void ProcessIO(void)
     }
     if (flag.RxUart)
     {
-        SetCharge(PRE_CHG);
+        if (RX_BUFF[0] == 'C')
+        {
+            switch(RX_BUFF[1])  {
+                case    'A': // "CA\n" set precharge mode
+                    SetCharge(PRE_CHG);
+                  break;
+                case    'B': // "CB\n" set tail charge mode
+                    SetCharge(TAIL_CHG);
+                  break;
+                case    'C': // "CC\n" set fast charge mode
+                    SetCharge(FAST_CHG);
+                  break;
+                case    'D':  // "CD*value*\n" set led, valid value: 0bxxxx00xx 
+                    SetLed(RX_BUFF[2]);
+                  break;
+                case    'E':  // "CE*value*\n" set ADS1115 Mux, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70) 
+                    SetMux(RX_BUFF[2]);
+                  break;
+                case    'F': // "CF\n" set pic16 temperature mux 
+                    SetTempMux();
+                  break;
+                case    'G': // "CG\n" set pic16 battery voltage mux 
+                    SetVbattMux();
+                  break;
+                
+                    
+                  
+                  
+                    
+            }
+        }
+        RX_BUFF[0] = 0;
+        RX_BUFF[1] = 0;
+        RX_BUFF[2] = 0;
         flag.RxUart = 0;
     }
         SetMux(0x70);
@@ -132,7 +169,7 @@ void ProcessIO(void)
         SetVbattMux();
         GetADC();     
         SetLed(0xAA);
-    */
+    
 error = I2C_Read(0x49, 0x01, &test[0], 2);
     
 }

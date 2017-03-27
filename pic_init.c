@@ -185,8 +185,8 @@ void Timer2_Init(void)  //init timer2
     TMR2 = 0x00;
 
     // Clearing IF flag before enabling the interrupt.
-PIR1bits.TMR2IF = 0;
-PIE1bits.TMR2IE = 1;
-T2CONbits.TMR2ON = 1;
+    PIR1bits.TMR2IF = 0;
+    PIE1bits.TMR2IE = 1;
+    T2CONbits.TMR2ON = 1;
 
 }

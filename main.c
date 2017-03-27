@@ -77,14 +77,14 @@ void interrupt ISR(void)
 {
     if(TIM_PWM_INT_F)
     {
-        TIM_PWM_REG = 0x01;
+        TIM_PWM_REG = 0x00;
         TIM_PWM_INT_F = 0;
         I2CTimeout++;
     }
     else
     {
 
-        if(UART_TX_INT_F && TX_UART_INT_E)
+        if(UART_TX_INT_F)
         {
             *pTX_W++;
             TX_UART_REG = *pTX_W;
@@ -99,8 +99,7 @@ void interrupt ISR(void)
         {
             *pRX_W = RX_UART_REG;
             if (RX_BUFF[0] == 'O' || RX_BUFF[0] == 'C') *pRX_W++;
-            if ( (&RX_BUFF[31] == pRX_W) ) pRX_W = &RX_BUFF[0];
-            if ( *pRX_W == '\n' ){ 
+            if ( *pRX_W == '\n' || (&RX_BUFF[31] == pRX_W) ) { 
                 pRX_W = &RX_BUFF[0];
                 flag.RxUart = 1;
             }
