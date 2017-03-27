@@ -18,7 +18,7 @@
 
 /** DEBUG ***********************************************************/
 	#define	TRIS_PORTTEST		
-	#define PORTTEST            
+	#define PORTTEST          
     #define PORTTEST2           
 
 /** TRIS ***********************************************************/

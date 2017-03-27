@@ -231,17 +231,18 @@ void ProcessIO(void)
         RX_BUFF[0] = 0;
         RX_BUFF[1] = 0;
         RX_BUFF[2] = 0;
+        RX_BUFF[3] = 0;
         flag.RxUart = 0;
     }
 
-    if (loop == 100)
+    if (loop == 100) //every 2ms
     {
         SetTempMux();
         Tbatt = GetADC();//Dummy, lost after mux switch
-        Tbatt = GetADC();
+        Tbatt = GetADC();// 0.847 = 0xd2
         SetVbattMux();
         Vbatt = GetADC();//Dummy, lost after mux switch
-        Vbatt = GetADC();
+        Vbatt = GetADC(); //3.11V = 0x304
         if (Vbatt < V_PRE){
             SetCharge(PRE_CHG);
         }
