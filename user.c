@@ -27,7 +27,7 @@ void InitI2cChip(void)
     //MCP23008
     data[0] = 0x00;
     error = I2C_Write(ADD_IOEXP, IODIR_IOEXP, &data[0], 1);
-    data[0] = 0x01;
+    data[0] = 0x11;
     error = I2C_Write(ADD_IOEXP, GPIO_IOEXP, &data[0], 1);
     error = I2C_Read(ADD_IOEXP, IODIR_IOEXP, &data[0], 1);
     
@@ -36,7 +36,7 @@ void InitI2cChip(void)
     data[0] = 0x43;
     data[1] = 0x83;
     error = I2C_Write(ADD_ADS, CFG_ADS, &data[0], 2);
-    error = I2C_Read(ADD_ADS, CFG_ADS, &data[0], 2);
+    error = I2C_Read(ADD_ADS, CFG_ADS, &test[0], 2);
 }
 
 void SetCharge(char cfg)
@@ -237,8 +237,10 @@ void ProcessIO(void)
     if (loop == 100)
     {
         SetTempMux();
+        Tbatt = GetADC();//Dummy, lost after mux switch
         Tbatt = GetADC();
         SetVbattMux();
+        Vbatt = GetADC();//Dummy, lost after mux switch
         Vbatt = GetADC();
         if (Vbatt < V_PRE){
             SetCharge(PRE_CHG);

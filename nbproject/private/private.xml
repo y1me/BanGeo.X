@@ -5,12 +5,10 @@
         <group>
             <file>file:/home/blobby/MPLABXProjects/BanGeo.X/pic_init.c</file>
             <file>file:/home/blobby/MPLABXProjects/BanGeo.X/h/hwprofile.h</file>
-            <file>file:/home/blobby/MPLABXProjects/BanGeo.X/i2c.c</file>
             <file>file:/home/blobby/MPLABXProjects/BanGeo.X/main.c</file>
             <file>file:/home/blobby/MPLABXProjects/BanGeo.X/h/user.h</file>
-            <file>file:/home/blobby/MPLABXProjects/BanGeo.X/h/pic_init.h</file>
+            <file>file:/home/blobby/MPLABXProjects/BanGeo.X/i2c.c</file>
             <file>file:/home/blobby/MPLABXProjects/BanGeo.X/user.c</file>
-            <file>file:/home/blobby/MPLABXProjects/BanGeo.X/h/i2c.h</file>
         </group>
     </open-files>
 </project-private>
