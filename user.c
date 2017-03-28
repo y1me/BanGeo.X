@@ -125,6 +125,17 @@ void ProcessIO(void)
     {
         InitI2cChip();
         //Init BLE
+        TX_BUFF[0] = 0xAA;
+        TX_BUFF[1] = 0xAA;
+        TX_BUFF[2] = 0xAA;
+        TX_BUFF[3] = 0xAA;
+        TX_BUFF[4] = 0xAA;
+        TX_BUFF[5] = 0xAA;
+        while(TX_UART_INT_E);
+        pTX_W = &TX_BUFF[0];
+        pTX_stop = &TX_BUFF[5];
+        TX_UART_INT_E = 1;
+        TX_UART_REG = *pTX_W;
         flag.Sys_Init = 1;
     }
     if (flag.RxUart)

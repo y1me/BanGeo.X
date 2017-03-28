@@ -88,7 +88,7 @@ void interrupt ISR(void)
         {
             *pTX_W++;
             TX_UART_REG = *pTX_W;
-            if ( pTX_W == pTX_stop ) {
+            if ( pTX_W > pTX_stop ) {
                 TX_UART_INT_E = 0;
                 pTX_W = &TX_BUFF[0];
             }
@@ -132,7 +132,7 @@ void main(void)
     INT_Init();
     I2C_Init();
     Timer2_Init();
-    PWM_Init();
+    NCO_Init();
     ADC_Init();
     USART_Init();
     // initialize variables

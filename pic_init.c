@@ -35,8 +35,9 @@ void pps_init(void) {
   RA4PPSbits.RA4PPS = 0x19; //SDA
   SSP1CLKPPSbits.SSP1CLKPPS = 0x02; //
   SSP1DATPPSbits.SSP1DATPPS = 0x04;
-  /*****PWM*****/
- RC3PPSbits.RC3PPS = 0x02; 
+  /*****NCO*****/
+ RC3PPSbits.RC3PPS = 0x1D; //RC3->NCO1:NCO;
+ 
   PPSLOCK = 0x55;
   PPSLOCK = 0xaa;
   PPSLOCKbits.PPSLOCKED = 1;		// lock PPS
@@ -63,13 +64,27 @@ void I2C_Init(void)  //init I2C Bus
     SSP1CON1bits.SSPEN = 1;
 }
 
-void PWM_Init(void)  //init PWM
+void NCO_Init(void)  //init PWM
 {
 
-//PWM5CON = 0x80;
-PWM5DCH = 0x04;
-PWM5DCL = 0x80;
+    // Set the NCO to the options selected in the GUI
+    // N1EN disabled; N1POL active_hi; N1PFM PFM_mode; 
+    NCO1CON = 0x01;
+    // N1CKS HFINTOSC; N1PWS 16_clk; 
+    NCO1CLK = 0x81;
 
+    NCO1ACCU = 0x00;
+
+    NCO1ACCH = 0x00;
+
+    NCO1ACCL = 0x00;
+
+    NCO1INCU = 0x00;
+    NCO1INCH = 0x60;
+    NCO1INCL = 0x00;
+    // Enable the NCO module
+    NCO1CONbits.N1EN = 1;
+    //ton = 500ns, toff = 830ns 
 }
 
 void ADC_Init(void)  //init ADC
@@ -101,8 +116,8 @@ void USART_Init(void)  //init USART
     
     RC1STAbits.RX9 = 0;
     BAUD1CONbits.BRG16 = 1;
-    SP1BRGH = 3;// a voir
-    SP1BRGL = 40;// 9600 : 0x340, 115200 : 0x44 
+    SP1BRGH = 0;// a voir
+    SP1BRGL = 0x44;// 9600 : 0x340, 115200 : 0x44 
     
     RC1STAbits.CREN = 1;
     TX1STAbits.TXEN = 1;
@@ -180,8 +195,9 @@ void Timer1_Init(void)  //init timer1
 
 void Timer2_Init(void)  //init timer2
 {
-    T2CON = 0x00;
-    PR2 = 0x0F;
+    T2CONbits.T2OUTPS = 0; // postscaler = 1/1
+    T2CONbits.T2CKPS = 1; // prescaler = 1/4
+    PR2 = 0xC8;
     TMR2 = 0x00;
 
     // Clearing IF flag before enabling the interrupt.
