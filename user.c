@@ -34,6 +34,7 @@ extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
   @Param
     bAdd  - Data EEPROM location to which data to be written
     bData - Data to be written to Data EEPROM location
+   Address F000h-F0FFh
 
   @Returns
     None
@@ -81,6 +82,7 @@ void DATAEE_WriteByte(uint16_t bAdd, uint8_t bData)
 
   @Param
     bAdd  - Data EEPROM location from which data has to be read
+   Address F000h-F0FFh
 
   @Returns
     Data byte read from given Data EEPROM location
