@@ -69,7 +69,7 @@ volatile char test[10];
 extern int I2CTimeout;
 
 volatile char RX_BUFF[32];
-volatile char TX_BUFF[32]= "dvdvxcxcvxv";
+volatile char TX_BUFF[32];
 volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
 
                     
@@ -83,12 +83,14 @@ void interrupt ISR(void)
         flag.tim100u = 1;
     }
 
-    if(UART_TX_INT_F)
+    if(UART_TX_INT_F && TX_UART_INT_E)
     {
-        *pTX_W++;
+        
         TX_UART_REG = *pTX_W;
+        *pTX_W++;
         if ( pTX_W > pTX_stop ) {
             TX_UART_INT_E = 0;
+            //UART_TX_EN = 0;
             pTX_W = &TX_BUFF[0];
         }
         UART_TX_INT_F = 0;
@@ -137,6 +139,7 @@ void main(void)
     pRX_W = &RX_BUFF[0];
     pTX_stop = &TX_BUFF[0];
     pTX_W = &TX_BUFF[0]; 
+    UART_TX_INT_F = 0;
     i=0;
     VOFFCHG = 0; //Shutdown charger
     flag.RxUart = 0; 

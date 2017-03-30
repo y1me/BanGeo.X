@@ -51,6 +51,7 @@
     #define RX_UART_REG     RC1REG
     #define UART_RX_OERR    RC1STAbits.OERR
     #define UART_RX_EN      RC1STAbits.CREN
+    #define UART_TX_EN      TX1STAbits.TXEN
 
     /** Timer Display ************************************************************/
 

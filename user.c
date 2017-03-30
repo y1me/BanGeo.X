@@ -130,17 +130,20 @@ void InitI2cChip(void)
 
 void InitBLE(void)
 {
-        TX_BUFF[0] = 0xAA;
-        TX_BUFF[1] = 0xAA;
-        TX_BUFF[2] = 0xAA;
-        TX_BUFF[3] = 0xAA;
-        TX_BUFF[4] = 0xAA;
-        TX_BUFF[5] = 0xAA;
-        while(TX_UART_INT_E);
+        
+        TX_BUFF[0] = 0x00;
+        TX_BUFF[1] = 0xFF;
+        TX_BUFF[2] = 0x00;
+        TX_BUFF[3] = 0xFF;
+        TX_BUFF[4] = 0x00;
+        TX_BUFF[5] = '\n';
+        
         pTX_W = &TX_BUFF[0];
         pTX_stop = &TX_BUFF[5];
-        TX_UART_INT_E = 1;
-        TX_UART_REG = *pTX_W;
+        UART_TX_EN = 1;
+        while(TX_UART_INT_E);
+        TX_UART_INT_E = 1;   
+        //TX_UART_REG = *pTX_W;
 }
 
 void SetCharge(char cfg)
@@ -225,6 +228,7 @@ void StartTX(void)
     while(TX_UART_INT_E);
     pTX_W = &TX_BUFF[0];
     TX_UART_INT_E = 1;
+    UART_TX_EN = 1;
     TX_UART_REG = *pTX_W;
 }
 

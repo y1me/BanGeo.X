@@ -116,11 +116,11 @@ void USART_Init(void)  //init USART
     
     RC1STAbits.RX9 = 0;
     BAUD1CONbits.BRG16 = 1;
-    SP1BRGH = 0;// a voir
-    SP1BRGL = 0x44;// 9600 : 0x340, 115200 : 0x44 
+    SP1BRGH = 0x3;// a voir
+    SP1BRGL = 0x40;// 9600 : 0x340, 115200 : 0x44 
     
     RC1STAbits.CREN = 1;
-    TX1STAbits.TXEN = 1;
+    TX1STAbits.TXEN = 0;
     
 }
 
