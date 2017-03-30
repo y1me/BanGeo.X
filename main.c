@@ -45,11 +45,11 @@ volatile struct chbits{
 						unsigned RxUart:1; 
 						unsigned TxUart:1; 
 						unsigned Sys_Init:1; 
-						unsigned tim1:1; 
+						unsigned tim100u:1; 
 						unsigned Dtime:1; 
 						unsigned Data1:1; 
 						unsigned Data2:1; 
-						unsigned bit7:1;
+						unsigned cont:1;
 		
 					}flag ;
                     
@@ -80,6 +80,7 @@ void interrupt ISR(void)
         TIM_PWM_REG = 0x00;
         TIM_PWM_INT_F = 0;
         I2CTimeout++;
+        flag.tim100u = 1;
     }
 
     if(UART_TX_INT_F)
@@ -141,11 +142,11 @@ void main(void)
     flag.RxUart = 0; 
 	flag.TxUart = 0; 
 	flag.Sys_Init = 0; 
-	flag.tim1 = 0; 
+	flag.tim100u = 0; 
 	flag.Dtime = 0; 
 	flag.Data1 = 0; 
 	flag.Data2 = 0; 
-	flag.bit7 = 0;
+	flag.cont = 0;
 
 	flagalt.bit0 = 0;
 	flagalt.bit1 = 0;

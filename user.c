@@ -6,20 +6,22 @@ extern volatile struct chbits{
 						unsigned RxUart:1; 
 						unsigned TxUart:1; 
 						unsigned Sys_Init:1; 
-						unsigned tim1:1; 
+						unsigned tim100u:1; 
 						unsigned Dtime:1; 
 						unsigned Data1:1; 
 						unsigned Data2:1; 
-						unsigned bit7:1;
+						unsigned cont:1;
 		
 					}flag ;
 
-volatile char error = 0;  
-volatile uint8_t test[10];
-volatile unsigned int ADSValue, Vbatt, Tbatt, loop = 0;
+volatile char AINMux = 0x04, error = 0;  
+volatile char test[10]; 
+volatile int AIN[4], *pAIN;
+volatile int ADSValue, Vbatt, Tbatt, PrevVbatt, PrevTbatt, loop = 0;
 extern volatile char RX_BUFF[32];
 extern volatile char TX_BUFF[32];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
+ int eeAddr;
 
 /**
   @Summary
@@ -126,6 +128,21 @@ void InitI2cChip(void)
     error = I2C_Read(ADD_ADS, CFG_ADS, &test[0], 2);
 }
 
+void InitBLE(void)
+{
+        TX_BUFF[0] = 0xAA;
+        TX_BUFF[1] = 0xAA;
+        TX_BUFF[2] = 0xAA;
+        TX_BUFF[3] = 0xAA;
+        TX_BUFF[4] = 0xAA;
+        TX_BUFF[5] = 0xAA;
+        while(TX_UART_INT_E);
+        pTX_W = &TX_BUFF[0];
+        pTX_stop = &TX_BUFF[5];
+        TX_UART_INT_E = 1;
+        TX_UART_REG = *pTX_W;
+}
+
 void SetCharge(char cfg)
 {
     // valid input value : FAST_CHG, TAIL_CHG, PRE_CHG 
@@ -191,8 +208,6 @@ int GetADC(void)
     return conv;
 }
 
-
-
 void Startconv(void)
 {
     // valid input value : AIN0,AIN1,AIN2,AIN3 
@@ -211,18 +226,10 @@ void ProcessIO(void)
     if (!flag.Sys_Init)
     {
         InitI2cChip();
-        //Init BLE
-        TX_BUFF[0] = 0xAA;
-        TX_BUFF[1] = 0xAA;
-        TX_BUFF[2] = 0xAA;
-        TX_BUFF[3] = 0xAA;
-        TX_BUFF[4] = 0xAA;
-        TX_BUFF[5] = 0xAA;
-        while(TX_UART_INT_E);
-        pTX_W = &TX_BUFF[0];
-        pTX_stop = &TX_BUFF[5];
-        TX_UART_INT_E = 1;
-        TX_UART_REG = *pTX_W;
+        InitBLE();
+        pAIN = &AIN[0];
+        AINMux = 0x04;
+
         flag.Sys_Init = 1;
     }
     if (flag.RxUart)
@@ -245,85 +252,87 @@ void ProcessIO(void)
                 case    'E':  // "CE*value*\n" set ADS1115 Mux, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70) 
                     SetMux(RX_BUFF[2]);
                   break;
-                case    'F': // "CF\n" get battery voltage and temperature 
+                case    'F': // "CF\n" get battery temperature and voltage 
                     TX_BUFF[0] = 'R';
                     TX_BUFF[1] = 'F';
-                    TX_BUFF[2] = '2';
+                    TX_BUFF[2] = '4';
                     TX_BUFF[3] = Tbatt;
                     TX_BUFF[4] = (Tbatt >> 8);
-                    TX_BUFF[5] = '\n';
+                    TX_BUFF[5] = Vbatt;
+                    TX_BUFF[6] = (Vbatt >> 8);
+                    TX_BUFF[7] = '\n';
                     while(TX_UART_INT_E);
                     pTX_W = &TX_BUFF[0];
-                    pTX_stop = &TX_BUFF[5];
+                    pTX_stop = &TX_BUFF[7];
                     TX_UART_INT_E = 1;
                     TX_UART_REG = *pTX_W;
                   break;
-                case    'G': // "CG\n" get battery ADS Voltage 
+                case    'G':
                     TX_BUFF[0] = 'R';
                     TX_BUFF[1] = 'G';
+                    TX_BUFF[2] = '8';
+                    TX_BUFF[3] = AIN[0];
+                    TX_BUFF[4] = (AIN[0] >> 8);
+                    TX_BUFF[5] = AIN[1];
+                    TX_BUFF[6] = (AIN[1] >> 8);
+                    TX_BUFF[7] = AIN[2];
+                    TX_BUFF[8] = (AIN[2] >> 8);
+                    TX_BUFF[9] = AIN[3];
+                    TX_BUFF[10] = (AIN[3] >> 8);
+                    TX_BUFF[11] = '\n';
+                    while(TX_UART_INT_E);
+                    pTX_W = &TX_BUFF[0];
+                    pTX_stop = &TX_BUFF[11];
+                    TX_UART_INT_E = 1;
+                    TX_UART_REG = *pTX_W; 
+                  break;
+                case    'H': // "CH*value1*\n" get ADS value and write in eeprom, user must provide a valid tail address, Beware Overlap!!!!!   
+                    eeAddr = 0xF000; 
+                    SetMux(RX_BUFF[2]);
+                    Startconv();
+                    while (Getconv() == 0x8000);
+                    ADSValue = Getconv();
+                    RX_BUFF[2] &= EEPROM_ADDR_n_MASK; 
+                    eeAddr |= RX_BUFF[2];
+                    DATAEE_WriteByte(eeAddr , ADSValue);
+                    DATAEE_WriteByte(eeAddr + 1, ADSValue >> 8);
+                 
+                  break;
+                case    'I': // "CI*value*\n  
+                    /***********/
+                  break;
+                case    'J': // "CI*value*\n 
+                    /***********/
+                  break;
+                case    'K': // "CK*value*\n" return ZERO, upper bound, lower bound calib user must provide a valid tail address 
+                    eeAddr = 0xF000; 
+                    RX_BUFF[2] &= EEPROM_ADDR_n_MASK;
+                    eeAddr |= RX_BUFF[2];
+
+                    TX_BUFF[4] = DATAEE_ReadByte(eeAddr);
+                    TX_BUFF[3] = DATAEE_ReadByte(eeAddr + 1);
+
+                    TX_BUFF[0] = 'R';
+                    TX_BUFF[1] = 'K';
                     TX_BUFF[2] = '2';
-                    TX_BUFF[3] = Vbatt;
-                    TX_BUFF[4] = (Vbatt >> 8);
                     TX_BUFF[5] = '\n';
                     while(TX_UART_INT_E);
                     pTX_W = &TX_BUFF[0];
                     pTX_stop = &TX_BUFF[5];
                     TX_UART_INT_E = 1;
                     TX_UART_REG = *pTX_W;
-                    
-                  break;
-                case    'H': // "CH*value*\n" get and write ZERO calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-                    /***********/
-                    SetMux(RX_BUFF[2]);
-                    Startconv();
-                    while (Getconv() == 0x8000);
-                    ADSValue = Getconv();
-                  break;
-                case    'I': // "CI*value*\n" get and write upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-                    /***********/
-                    SetMux(RX_BUFF[2]);
-                    Startconv();
-                    while (Getconv() == 0x8000);
-                    ADSValue = Getconv();
-                  break;
-                case    'J': // "CI*value*\n" get and write lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-                    /***********/
-                    SetMux(RX_BUFF[2]);
-                    Startconv();
-                    while (Getconv() == 0x8000);
-                    ADSValue = Getconv();
-                  break;
-                case    'K': // "CK*value*\n" return ZERO calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-                    /***********/
+                        
                   break;
                 case    'L': // "CL*value*\n" return upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-                    /***********/
+               
                   break;
                 case    'M': // "CM*value*\n" return lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-                    /***********/
+                    //flag.cont = 1;
                   break;
                 case    'N': // "CN\n" return ADS Value on   
-                    Startconv();
-                    while (Getconv() == 0x8000);
-                    ADSValue = Getconv();
-                    TX_BUFF[0] = 'R';
-                    TX_BUFF[1] = 'N';
-                    TX_BUFF[2] = '2';
-                    TX_BUFF[3] = ADSValue;
-                    TX_BUFF[4] = (ADSValue >> 8);
-                    TX_BUFF[5] = '\n';
-                    while(TX_UART_INT_E);
-                    pTX_W = &TX_BUFF[0];
-                    pTX_stop = &TX_BUFF[5];
-                    TX_UART_INT_E = 1;
-                    TX_UART_REG = *pTX_W;
                     
-                    
-                    
+                    //flag.cont = 0;
                   break;
-                
-                  
-
             }
         }
         RX_BUFF[0] = 0;
@@ -333,26 +342,50 @@ void ProcessIO(void)
         flag.RxUart = 0;
     }
 
-    if (loop == 100) //every 2ms
+    if (flag.tim100u) //every 100µs
     {
-        SetTempMux();
-        Tbatt = GetADC();//Dummy, lost after mux switch
-        Tbatt = GetADC();// 0.847 = 0xd2
-        SetVbattMux();
-        Vbatt = GetADC();//Dummy, lost after mux switch
-        Vbatt = GetADC(); //3.11V = 0x304
-        if (Vbatt < V_PRE){
-            SetCharge(PRE_CHG);
+        loop++;
+        if (loop == 200) //every 20ms
+        {
+            SetTempMux();        
+            Tbatt = GetADC();//Dummy, lost after mux switch
+            Tbatt = GetADC();// 0.847 = 0xd2
+            SetVbattMux();
+            PrevVbatt = Vbatt;
+            Vbatt = GetADC();//Dummy, lost after mux switch
+            Vbatt = GetADC(); //3.11V = 0x304
+            if (Vbatt < V_PRE){
+                SetCharge(PRE_CHG);
+            }
+            else if (Vbatt < V_TAIL) {
+                SetCharge(FAST_CHG);
+            }
+            else {
+                if (((Vbatt - PrevVbatt) < -10) || (Vbatt > V_OVER) ) {
+                    SetCharge(TAIL_CHG);
+                }
+                
+            }
+            loop = 0;
+            if (flag.cont)
+            {
+            Startconv();
+            while (Getconv() == 0x8000);
+            *pAIN = Getconv();
+            *pAIN++; 
+            AINMux++;
+            if (AINMux > 0x7)
+            {
+                pAIN = &AIN[0];
+                AINMux = 0x04;
+            }
+            SetMux(AINMux << 4);
+            Startconv();
+            }
         }
-        else if (Vbatt < V_TAIL) {
-            SetCharge(FAST_CHG);
-        }
-        else {
-            SetCharge(TAIL_CHG);
-        }
-        loop = 0;
+        flag.tim100u = 0;
     }
-    loop++;
+    
     
 
     
