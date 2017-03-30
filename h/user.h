@@ -10,6 +10,8 @@
 #define V_PRE           0x236
 #define V_TAIL          0x3B0
 #define V_OVER          0x3FF
+#define V_DIF_Tail      -10
+#define T_DIF_Tail      10
 
 #define AIN0            0x40
 #define AIN1            0x50

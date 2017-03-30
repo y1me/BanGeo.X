@@ -347,7 +347,8 @@ void ProcessIO(void)
         loop++;
         if (loop == 200) //every 20ms
         {
-            SetTempMux();        
+            SetTempMux(); 
+            PrevTbatt = Tbatt;
             Tbatt = GetADC();//Dummy, lost after mux switch
             Tbatt = GetADC();// 0.847 = 0xd2
             SetVbattMux();
@@ -361,7 +362,10 @@ void ProcessIO(void)
                 SetCharge(FAST_CHG);
             }
             else {
-                if (((Vbatt - PrevVbatt) < -10) || (Vbatt > V_OVER) ) {
+                if ( (Vbatt - PrevVbatt) < V_DIF_Tail ) {
+                    SetCharge(TAIL_CHG);
+                }
+                if ( (Tbatt - PrevTbatt) > T_DIF_Tail ) {
                     SetCharge(TAIL_CHG);
                 }
                 
