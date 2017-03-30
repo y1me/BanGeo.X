@@ -220,6 +220,14 @@ void Startconv(void)
     error = I2C_Write(ADD_ADS, CFG_ADS, &data[0], 2); 
 }
 
+void StartTX(void)
+{
+    while(TX_UART_INT_E);
+    pTX_W = &TX_BUFF[0];
+    TX_UART_INT_E = 1;
+    TX_UART_REG = *pTX_W;
+}
+
 void ProcessIO(void)
 {
     
@@ -261,13 +269,12 @@ void ProcessIO(void)
                     TX_BUFF[5] = Vbatt;
                     TX_BUFF[6] = (Vbatt >> 8);
                     TX_BUFF[7] = '\n';
-                    while(TX_UART_INT_E);
-                    pTX_W = &TX_BUFF[0];
                     pTX_stop = &TX_BUFF[7];
-                    TX_UART_INT_E = 1;
-                    TX_UART_REG = *pTX_W;
+                    
+                    StartTX();
                   break;
                 case    'G':
+                    
                     TX_BUFF[0] = 'R';
                     TX_BUFF[1] = 'G';
                     TX_BUFF[2] = '8';
@@ -280,11 +287,10 @@ void ProcessIO(void)
                     TX_BUFF[9] = AIN[3];
                     TX_BUFF[10] = (AIN[3] >> 8);
                     TX_BUFF[11] = '\n';
-                    while(TX_UART_INT_E);
-                    pTX_W = &TX_BUFF[0];
                     pTX_stop = &TX_BUFF[11];
-                    TX_UART_INT_E = 1;
-                    TX_UART_REG = *pTX_W; 
+                    
+                    StartTX(); 
+                    
                   break;
                 case    'H': // "CH*value1*\n" get ADS value and write in eeprom, user must provide a valid tail address, Beware Overlap!!!!!   
                     eeAddr = 0xF000; 
@@ -316,11 +322,9 @@ void ProcessIO(void)
                     TX_BUFF[1] = 'K';
                     TX_BUFF[2] = '2';
                     TX_BUFF[5] = '\n';
-                    while(TX_UART_INT_E);
-                    pTX_W = &TX_BUFF[0];
                     pTX_stop = &TX_BUFF[5];
-                    TX_UART_INT_E = 1;
-                    TX_UART_REG = *pTX_W;
+                    
+                    StartTX();
                         
                   break;
                 case    'L': // "CL*value*\n" return upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
@@ -345,6 +349,9 @@ void ProcessIO(void)
     if (flag.tim100u) //every 100µs
     {
         loop++;
+         if (loop == 100) {
+             Startconv();
+         }
         if (loop == 200) //every 20ms
         {
             SetTempMux(); 
@@ -373,18 +380,17 @@ void ProcessIO(void)
             loop = 0;
             if (flag.cont)
             {
-            Startconv();
-            while (Getconv() == 0x8000);
-            *pAIN = Getconv();
-            *pAIN++; 
-            AINMux++;
-            if (AINMux > 0x7)
-            {
-                pAIN = &AIN[0];
-                AINMux = 0x04;
-            }
-            SetMux(AINMux << 4);
-            Startconv();
+                while (Getconv() == 0x8000);
+                *pAIN = Getconv();
+                *pAIN++; 
+                AINMux++;
+                if (AINMux > 0x7)
+                {
+                    pAIN = &AIN[0];
+                    AINMux = 0x04;
+                }
+                SetMux(AINMux << 4);
+                Startconv();
             }
         }
         flag.tim100u = 0;
