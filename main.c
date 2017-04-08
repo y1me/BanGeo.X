@@ -99,10 +99,13 @@ void interrupt ISR(void)
     if(UART_RX_INT_F)
     {
         *pRX_W = RX_UART_REG;
-        if (RX_BUFF[0] == 'O' || RX_BUFF[0] == 'C') *pRX_W++;
-        if ( *pRX_W == '\n' || (&RX_BUFF[31] == pRX_W) ) { 
-            pRX_W = &RX_BUFF[0];
-            flag.RxUart = 1;
+        if (RX_BUFF[0] == 'O' || RX_BUFF[0] == 'C') 
+        {
+            *pRX_W++;
+            if ( *(pRX_W - 1) == '\n' || (&RX_BUFF[31] == pRX_W) ) { 
+                pRX_W = &RX_BUFF[0];
+                flag.RxUart = 1;
+            }
         }
         UART_RX_INT_F = 0;
 

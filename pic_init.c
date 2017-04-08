@@ -106,8 +106,8 @@ void USART_Init(void)  //init USART
 {
     
     RC1STAbits.SPEN = 1;
-    TRISCbits.TRISC4 = 1;
-    TRISCbits.TRISC5 = 0;
+    TRISCbits.TRISC4 = 0;
+    TRISCbits.TRISC5 = 1;
     
     TX1STAbits.TX9 = 0;
     TX1STAbits.SYNC = 0;
@@ -116,8 +116,8 @@ void USART_Init(void)  //init USART
     
     RC1STAbits.RX9 = 0;
     BAUD1CONbits.BRG16 = 1;
-    SP1BRGH = 0x3;// a voir
-    SP1BRGL = 0x40;// 9600 : 0x340, 115200 : 0x44 
+    SP1BRGH = 0x00;// a voir
+    SP1BRGL = 0x44;// 9600 : 0x340, 115200 : 0x44 
     
     RC1STAbits.CREN = 1;
     TX1STAbits.TXEN = 0;

@@ -17,7 +17,7 @@ extern volatile struct chbits{
 volatile char AINMux = 0x04, error = 0;  
 volatile char test[10]; 
 volatile int AIN[4], *pAIN;
-volatile int ADSValue, Vbatt, Tbatt, PrevVbatt, PrevTbatt, loop = 0;
+volatile int ADSValue, Vbatt, Tbatt, PrevVbatt, PrevTbatt, loop = 0, loop2 = 0;
 extern volatile char RX_BUFF[32];
 extern volatile char TX_BUFF[32];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
@@ -128,23 +128,22 @@ void InitI2cChip(void)
     error = I2C_Read(ADD_ADS, CFG_ADS, &test[0], 2);
 }
 
-void InitBLE(void)
+void delay_us(unsigned long delay)
 {
-        
-        TX_BUFF[0] = 0x00;
-        TX_BUFF[1] = 0xFF;
-        TX_BUFF[2] = 0x00;
-        TX_BUFF[3] = 0xFF;
-        TX_BUFF[4] = 0x00;
-        TX_BUFF[5] = '\n';
-        
-        pTX_W = &TX_BUFF[0];
-        pTX_stop = &TX_BUFF[5];
-        UART_TX_EN = 1;
-        while(TX_UART_INT_E);
-        TX_UART_INT_E = 1;   
-        //TX_UART_REG = *pTX_W;
+    unsigned long count = 0;
+    while (count < delay){
+            NOP();
+            NOP();
+            NOP();
+            NOP();
+            NOP();
+            NOP();
+            NOP();
+            NOP();
+            count++;
+        }
 }
+
 
 void SetCharge(char cfg)
 {
@@ -225,11 +224,10 @@ void Startconv(void)
 
 void StartTX(void)
 {
-    while(TX_UART_INT_E);
     pTX_W = &TX_BUFF[0];
-    TX_UART_INT_E = 1;
     UART_TX_EN = 1;
-    TX_UART_REG = *pTX_W;
+    while(TX_UART_INT_E);
+    TX_UART_INT_E = 1;
 }
 
 void ProcessIO(void)
@@ -238,12 +236,13 @@ void ProcessIO(void)
     if (!flag.Sys_Init)
     {
         InitI2cChip();
-        InitBLE();
+        //InitBLE();
         pAIN = &AIN[0];
         AINMux = 0x04;
 
         flag.Sys_Init = 1;
     }
+    
     if (flag.RxUart)
     {
         if (RX_BUFF[0] == 'C')
@@ -349,9 +348,15 @@ void ProcessIO(void)
         RX_BUFF[3] = 0;
         flag.RxUart = 0;
     }
+if (loop2 == 10000) {
+
+    loop2 = 0;
+}
+        
 
     if (flag.tim100u) //every 100µs
     {
+        loop2++;
         loop++;
          if (loop == 100) {
              Startconv();

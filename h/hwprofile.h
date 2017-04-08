@@ -43,9 +43,10 @@
 /** BATTERY CHARGER ***********************************************************/
 	#define VOFFCHG             PORTAbits.RA5
     #define VTEMP               PORTAbits.RA4       
-    /** EUSART ************************************************************/   
+/** EUSART ************************************************************/   
     #define UART_TX_INT_F   PIR1bits.TXIF
     #define TX_UART_REG     TX1REG
+    #define TX_REG_FULL     TX1STAbits.TRMT
     #define TX_UART_INT_E   PIE1bits.TXIE
     #define UART_RX_INT_F   PIR1bits.RCIF
     #define RX_UART_REG     RC1REG
