@@ -14,14 +14,14 @@ extern volatile struct chbits{
 		
 					}flag ;
 
-volatile char AINMux = 0x04, error = 0;  
+volatile char AINMux = 0x04, error = 0, Led = 0;;  
 volatile char test[10]; 
 volatile int AIN[4], *pAIN;
 volatile int ADSValue, Vbatt, Tbatt, PrevVbatt, PrevTbatt, loop = 0, loop2 = 0;
 extern volatile char RX_BUFF[32];
 extern volatile char TX_BUFF[32];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
- int eeAddr;
+int eeAddr;
 
 /**
   @Summary
@@ -116,7 +116,7 @@ void InitI2cChip(void)
     //MCP23008
     data[0] = 0x00;
     error = I2C_Write(ADD_IOEXP, IODIR_IOEXP, &data[0], 1);
-    data[0] = 0x11;
+    data[0] = 0x10;
     error = I2C_Write(ADD_IOEXP, GPIO_IOEXP, &data[0], 1);
     error = I2C_Read(ADD_IOEXP, IODIR_IOEXP, &data[0], 1);
     
@@ -258,7 +258,8 @@ void ProcessIO(void)
                     SetCharge(FAST_CHG);
                   break;
                 case    'D':  // "CD*value*\n" set led, valid value: 0bxxxx00xx 
-                    SetLed(RX_BUFF[2]);
+                    Led |= RX_BUFF[2];
+                    SetLed(Led);
                   break;
                 case    'E':  // "CE*value*\n" set ADS1115 Mux, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70) 
                     SetMux(RX_BUFF[2]);
@@ -298,6 +299,7 @@ void ProcessIO(void)
                 case    'H': // "CH*value1*\n" get ADS value and write in eeprom, user must provide a valid tail address, Beware Overlap!!!!!   
                     eeAddr = 0xF000; 
                     SetMux(RX_BUFF[2]);
+                    delay_us(100000);
                     Startconv();
                     while (Getconv() == 0x8000);
                     ADSValue = Getconv();
@@ -307,8 +309,9 @@ void ProcessIO(void)
                     DATAEE_WriteByte(eeAddr + 1, ADSValue >> 8);
                  
                   break;
-                case    'I': // "CI*value*\n  
-                    /***********/
+                case    'I': // "CI*value*\n clear led, valid value: 0bxxxx00xx 
+                    Led &= RX_BUFF[2];
+                    SetLed(Led);
                   break;
                 case    'J': // "CI*value*\n 
                     /***********/
@@ -333,12 +336,12 @@ void ProcessIO(void)
                 case    'L': // "CL*value*\n" return upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
                
                   break;
-                case    'M': // "CM*value*\n" return lower bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-                    //flag.cont = 1;
+                case    'M': // "CM\n" Enable continuous conversion on ADS 
+                    flag.cont = 1;
                   break;
-                case    'N': // "CN\n" return ADS Value on   
+                case    'N': // "CN\n" Disable continuous conversion on ADS   
                     
-                    //flag.cont = 0;
+                    flag.cont = 0;
                   break;
             }
         }
