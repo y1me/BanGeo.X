@@ -16,8 +16,8 @@ extern volatile struct chbits{
 
 volatile char AINMux = 0x04, error = 0, Led = 0;;  
 volatile char test[10]; 
-volatile int AIN[4], *pAIN;
-volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, loop2 = 0, diff;
+volatile int AIN[4];
+volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff, iMux = 0;
 extern volatile char RX_BUFF[32];
 extern volatile char TX_BUFF[32];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
@@ -180,7 +180,7 @@ int Getconv(void)
     char data[2];
     int conv = 0x8000;
     error = I2C_Read(ADD_ADS, CONV_ADS, &data[0], 2);
-    if (data[0] < 128 ) return conv;
+    if (data[0] > 128 ) return conv;
     
     error = I2C_Read(ADD_ADS, CONV_ADS, &data[0], 2);
     conv |= data[0];
@@ -214,8 +214,8 @@ void Startconv(void)
 {
     // valid input value : AIN0,AIN1,AIN2,AIN3 
     char data[2];
-    data[0] = 0x80;
-    while (data[0] > 0x80) {
+    data[0] = 0x00;
+    while (data[0] < 0x80) {
         error = I2C_Read(ADD_ADS, CFG_ADS, &data[0], 2);
     }
     data[0] |= CONV_MASK; 
@@ -237,7 +237,6 @@ void ProcessIO(void)
     {
         InitI2cChip();
         //InitBLE();
-        pAIN = &AIN[0];
         AINMux = 0x04;
         Startconv();
         flag.Sys_Init = 1;
@@ -367,7 +366,6 @@ if (flag.Button == 1) {
 
     if (flag.tim100u) //every 100µs
     {
-        loop2++;
         loop++;
          if (loop == 100) {
              Startconv();
@@ -404,20 +402,20 @@ if (flag.Button == 1) {
                 
             }
             loop = 0;
-            if (flag.cont)
-            {
+
                 while (Getconv() == 0x8000);
-                *pAIN = Getconv();
-                *pAIN++; 
+                
+                AIN[iMux] = Getconv();
+                iMux++; 
                 AINMux++;
                 if (AINMux > 0x7)
                 {
-                    pAIN = &AIN[0];
+                    iMux = 0;
                     AINMux = 0x04;
                 }
                 SetMux(AINMux << 4);
                 Startconv();
-            }
+            
         }
         flag.tim100u = 0;
     }
