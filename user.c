@@ -7,7 +7,7 @@ extern volatile struct chbits{
 						unsigned TxUart:1; 
 						unsigned Sys_Init:1; 
 						unsigned tim100u:1; 
-						unsigned Dtime:1; 
+						unsigned Button:1; 
 						unsigned Data1:1; 
 						unsigned Data2:1; 
 						unsigned cont:1;
@@ -17,7 +17,7 @@ extern volatile struct chbits{
 volatile char AINMux = 0x04, error = 0, Led = 0;;  
 volatile char test[10]; 
 volatile int AIN[4], *pAIN;
-volatile int ADSValue, Vbatt, Tbatt, PrevVbatt, PrevTbatt, loop = 0, loop2 = 0;
+volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, loop2 = 0, diff;
 extern volatile char RX_BUFF[32];
 extern volatile char TX_BUFF[32];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
@@ -179,7 +179,7 @@ int Getconv(void)
     // return conversion value 
     char data[2];
     int conv = 0x8000;
-    error = I2C_Read(ADD_ADS, CFG_ADS, &data[0], 2);
+    error = I2C_Read(ADD_ADS, CONV_ADS, &data[0], 2);
     if (data[0] < 128 ) return conv;
     
     error = I2C_Read(ADD_ADS, CONV_ADS, &data[0], 2);
@@ -239,7 +239,7 @@ void ProcessIO(void)
         //InitBLE();
         pAIN = &AIN[0];
         AINMux = 0x04;
-
+        Startconv();
         flag.Sys_Init = 1;
     }
     
@@ -248,14 +248,14 @@ void ProcessIO(void)
         if (RX_BUFF[0] == 'C')
         {
             switch(RX_BUFF[1])  {
-                case    'A': // "CA\n" set precharge mode
-                    SetCharge(PRE_CHG);
+                case    'A': // "CA\n" enable charge mode
+                    CHG_ON = 1;
                   break;
-                case    'B': // "CB\n" set tail charge mode
-                    SetCharge(TAIL_CHG);
+                case    'B': // "CB\n" disable charge mode
+                    CHG_ON = 0;
                   break;
-                case    'C': // "CC\n" set fast charge mode
-                    SetCharge(FAST_CHG);
+                case    'C': // "CC\n" 
+                 
                   break;
                 case    'D':  // "CD*value*\n" set led, valid value: 0bxxxx00xx 
                     Led |= RX_BUFF[2];
@@ -351,9 +351,17 @@ void ProcessIO(void)
         RX_BUFF[3] = 0;
         flag.RxUart = 0;
     }
-if (loop2 == 10000) {
+    
+    
+if (flag.Button == 1) {
+    TX_BUFF[0] = 'B';
+    TX_BUFF[1] = 'P';
+    TX_BUFF[2] = '\n';
+    pTX_stop = &TX_BUFF[2];
+    StartTX();
+    
+    flag.Button = 0;
 
-    loop2 = 0;
 }
         
 
@@ -373,15 +381,21 @@ if (loop2 == 10000) {
             SetVbattMux();
             PrevVbatt = Vbatt;
             Vbatt = GetADC();//Dummy, lost after mux switch
-            Vbatt = GetADC(); //3.11V = 0x304
+            Vbatt = GetADC(); //3.11V = 0x304 ratio mesure 34/81
+       
             if (Vbatt < V_PRE){
                 SetCharge(PRE_CHG);
             }
             else if (Vbatt < V_TAIL) {
                 SetCharge(FAST_CHG);
+                PrevVbatt = Vbatt;
             }
             else {
-                if ( (Vbatt - PrevVbatt) < V_DIF_Tail ) {
+               if (PrevVbatt < Vbatt) {
+                    PrevVbatt = Vbatt;   
+                }
+                diff = Vbatt - PrevVbatt;
+                if ( diff < V_DIF_Tail ) {
                     SetCharge(TAIL_CHG);
                 }
                 if ( (Tbatt - PrevTbatt) > T_DIF_Tail ) {

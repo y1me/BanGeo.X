@@ -6,11 +6,11 @@
 /** Battery Charging ***********************************************************/
 #define FAST_CHG        0x0C
 #define TAIL_CHG        0x00
-#define PRE_CHG         0x04
+#define PRE_CHG         0x08
 #define V_PRE           0x236
 #define V_TAIL          0x3B0
 #define V_OVER          0x3FF
-#define V_DIF_Tail      -10
+#define V_DIF_Tail      -7
 #define T_DIF_Tail      10
 
 #define AIN0            0x40

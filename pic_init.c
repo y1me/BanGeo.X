@@ -13,9 +13,11 @@ void Port_Init(void)  //init i/o
     //Set/Unset analog pin
 
     ANSELAbits.ANSA5 = 0;
+    ANSELCbits.ANSC2 = 0;
     ANSELCbits.ANSC3 = 0;
     ANSELCbits.ANSC4 = 0;
     ANSELCbits.ANSC5 = 0;
+    TRISCbits.TRISC2 = INPUT_PIN;
     TRISCbits.TRISC3 = OUTPUT_PIN;
     TRISAbits.TRISA5 = OUTPUT_PIN;
     TRISAbits.TRISA4 = INPUT_PIN;
@@ -36,7 +38,10 @@ void pps_init(void) {
   SSP1CLKPPSbits.SSP1CLKPPS = 0x02; //
   SSP1DATPPSbits.SSP1DATPPS = 0x04;
   /*****NCO*****/
- RC3PPSbits.RC3PPS = 0x1D; //RC3->NCO1:NCO;
+  RC3PPSbits.RC3PPS = 0x1D; //RC3->NCO1:NCO;
+  /*****INT EXT*****/
+  INTPPSbits.INTPPS = 0x12; //RC2->INT EXT;
+  
  
   PPSLOCK = 0x55;
   PPSLOCK = 0xaa;
@@ -80,11 +85,11 @@ void NCO_Init(void)  //init PWM
     NCO1ACCL = 0x00;
 
     NCO1INCU = 0x00;
-    NCO1INCH = 0x60;
-    NCO1INCL = 0x00;
+    NCO1INCH = 0x71;
+    NCO1INCL = 0xAA;
     // Enable the NCO module
     NCO1CONbits.N1EN = 1;
-    //ton = 500ns, toff = 830ns 
+    //ton = 500ns, toff = 626ns 
 }
 
 void ADC_Init(void)  //init ADC
@@ -135,6 +140,12 @@ void INT_Init(void)  //init Interrupt
     
     //UART interrupt
     PIE1bits.TXIE = 0;
+    
+    //INT1 interrupt
+
+	INTCONbits.INTEDG = 0;
+	PIE0bits.INTE = 1;
+	PIR0bits.INTF = 0;
     
     //PIE1bits.RCIE = 1;
  

@@ -42,6 +42,7 @@
     #define ADC_L               ADRESL
 /** BATTERY CHARGER ***********************************************************/
 	#define VOFFCHG             PORTAbits.RA5
+    #define CHG_ON              TRISAbits.TRISA5
     #define VTEMP               PORTAbits.RA4       
 /** EUSART ************************************************************/   
     #define UART_TX_INT_F   PIR1bits.TXIF
@@ -53,6 +54,8 @@
     #define UART_RX_OERR    RC1STAbits.OERR
     #define UART_RX_EN      RC1STAbits.CREN
     #define UART_TX_EN      TX1STAbits.TXEN
+/** EUSART ************************************************************/
+    #define INT_EXT_F       PIR0bits.INTF
 
     /** Timer Display ************************************************************/
 

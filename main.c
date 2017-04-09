@@ -46,7 +46,7 @@ volatile struct chbits{
 						unsigned TxUart:1; 
 						unsigned Sys_Init:1; 
 						unsigned tim100u:1; 
-						unsigned Dtime:1; 
+						unsigned Button:1; 
 						unsigned Data1:1; 
 						unsigned Data2:1; 
 						unsigned cont:1;
@@ -110,8 +110,9 @@ void interrupt ISR(void)
         UART_RX_INT_F = 0;
 
     }
-    if(PIR0bits.INTF) {
-        PIR0bits.INTF = 0;
+    if(INT_EXT_F) {
+        flag.Button = 1;
+        INT_EXT_F = 0;
     } 
     if(PIR1bits.TMR1GIF) {
         PIR1bits.TMR1GIF = 0;
@@ -129,6 +130,7 @@ volatile int i,z;
 
 void main(void)
 {
+    VOFFCHG = 0; //Shutdown charger
     // initialize the device
     pps_init();
     Port_Init();
@@ -144,12 +146,12 @@ void main(void)
     pTX_W = &TX_BUFF[0]; 
     UART_TX_INT_F = 0;
     i=0;
-    VOFFCHG = 0; //Shutdown charger
+    
     flag.RxUart = 0; 
 	flag.TxUart = 0; 
 	flag.Sys_Init = 0; 
 	flag.tim100u = 0; 
-	flag.Dtime = 0; 
+	flag.Button = 0; 
 	flag.Data1 = 0; 
 	flag.Data2 = 0; 
 	flag.cont = 0;
@@ -162,7 +164,7 @@ void main(void)
 	flagalt.bit5 = 0;
 	flagalt.free3 = 0;
 	flagalt.bit7 = 0;
-    
+    CHG_ON = 1;
     while (1) {        
         ProcessIO();
     }
