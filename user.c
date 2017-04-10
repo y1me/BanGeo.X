@@ -14,14 +14,14 @@ extern volatile struct chbits{
 		
 					}flag ;
 
-volatile char AINMux = 0x04, error = 0, Led = 0;;  
+volatile char AINMux = 0x04, Led = 0;;  
 volatile char draft[10]; 
 volatile int AIN[4];
 volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff, iMux = 0;
 
 extern volatile char RX_BUFF[15];
 extern volatile char TX_BUFF[15];
-extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
+extern volatile unsigned char *pRX_W, *pTX_stop, *pTX_W;
 int eeAddr;
 /*
  

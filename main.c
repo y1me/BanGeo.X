@@ -56,7 +56,7 @@ extern int I2CTimeout;
 
 volatile char RX_BUFF[16];
 volatile char TX_BUFF[16];
-volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
+volatile unsigned char *pRX_W, *pTX_stop, *pTX_W;
 
                     
 void interrupt ISR(void)
