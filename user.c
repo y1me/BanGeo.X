@@ -23,6 +23,35 @@ extern volatile char RX_BUFF[15];
 extern volatile char TX_BUFF[15];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
 int eeAddr;
+/*
+ 
+Here are three examples of pointer definitions using the volatile qualifier. The fields
+in the definitions have been highlighted with spacing:
+volatile int *
+int
+* volatile
+volatile int * volatile
+vip ;
+ivp ;
+vivp ;
+The first example is a pointer called vip. It contains the address of int objects that
+are qualified volatile. The pointer itself ? the variable that holds the address ? is not
+volatile; however, the objects that are accessed when the pointer is dereferenced
+are treated as being volatile. In other words, the target objects accessible via the
+pointer can be externally modified.
+The second example is a pointer called ivp which also contains the address of int
+objects. In this example, the pointer itself is volatile, that is, the address the pointer
+contains can be externally modified; however, the objects that can be accessed when
+dereferencing the pointer are not volatile.
+The last example is of a pointer called vivp which is itself qualified volatile, and
+which also holds the address of volatile objects.
+Bear in mind that one pointer can be assigned the addresses of many objects; for
+example, a pointer that is a parameter to a function is assigned a new object address
+every time the function is called. The definition of the pointer must be valid for every
+target address assigned.
+ * 
+*/ 
+
 
 /**
   @Summary
