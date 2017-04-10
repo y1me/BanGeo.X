@@ -15,11 +15,12 @@ extern volatile struct chbits{
 					}flag ;
 
 volatile char AINMux = 0x04, error = 0, Led = 0;;  
-volatile char test[10]; 
+volatile char draft[10]; 
 volatile int AIN[4];
 volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff, iMux = 0;
-extern volatile char RX_BUFF[32];
-extern volatile char TX_BUFF[32];
+
+extern volatile char RX_BUFF[15];
+extern volatile char TX_BUFF[15];
 extern volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
 int eeAddr;
 
@@ -52,7 +53,6 @@ int eeAddr;
 
 void DATAEE_WriteByte(uint16_t bAdd, uint8_t bData)
 {
-    uint8_t GIEBitValue = INTCONbits.GIE;
 
     NVMADRH = ((bAdd >> 8) & 0xFF);
     NVMADRL = (bAdd & 0xFF);
@@ -69,7 +69,7 @@ void DATAEE_WriteByte(uint16_t bAdd, uint8_t bData)
     }
 
     NVMCON1bits.WREN = 0;
-    INTCONbits.GIE = GIEBitValue;   // restore interrupt enable
+    INTCONbits.GIE = 1;   // restore interrupt enable
 }
 
 /**
@@ -121,11 +121,11 @@ void InitI2cChip(void)
     error = I2C_Read(ADD_IOEXP, IODIR_IOEXP, &data[0], 1);
     
     //ADS1115
-    error = I2C_Read(ADD_ADS, CFG_ADS, &test[0], 2);
+    error = I2C_Read(ADD_ADS, CFG_ADS, &draft[0], 2);
     data[0] = 0x43;
     data[1] = 0x83;
     error = I2C_Write(ADD_ADS, CFG_ADS, &data[0], 2);
-    error = I2C_Read(ADD_ADS, CFG_ADS, &test[0], 2);
+    error = I2C_Read(ADD_ADS, CFG_ADS, &draft[0], 2);
 }
 
 void delay_us(unsigned long delay)

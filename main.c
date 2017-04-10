@@ -52,24 +52,11 @@ volatile struct chbits{
 						unsigned cont:1;
 		
 					}flag ;
-                    
-volatile struct chbitsalt{
-						unsigned bit0:1;
-						unsigned bit1:1;
-						unsigned info:1;
-						unsigned strinfo:1;
-						unsigned bit4:1;
-						unsigned bit5:1;
-						unsigned free3:1;
-						unsigned bit7:1;
-
-					}flagalt ;
-
-volatile char test[10];                    
+            
 extern int I2CTimeout;
 
-volatile char RX_BUFF[32];
-volatile char TX_BUFF[32];
+volatile char RX_BUFF[16];
+volatile char TX_BUFF[16];
 volatile unsigned char error, *pRX_W, *pTX_stop, *pTX_W;
 
                     
@@ -102,7 +89,7 @@ void interrupt ISR(void)
         if (RX_BUFF[0] == 'O' || RX_BUFF[0] == 'C') 
         {
             *pRX_W++;
-            if ( *(pRX_W - 1) == '\n' || (&RX_BUFF[31] == pRX_W) ) { 
+            if ( *(pRX_W - 1) == '\n' || (&RX_BUFF[15] == pRX_W) ) { 
                 pRX_W = &RX_BUFF[0];
                 flag.RxUart = 1;
             }
@@ -156,14 +143,6 @@ void main(void)
 	flag.Data2 = 0; 
 	flag.cont = 0;
 
-	flagalt.bit0 = 0;
-	flagalt.bit1 = 0;
-	flagalt.info = 0;
-	flagalt.strinfo = 0;
-	flagalt.bit4 = 0;
-	flagalt.bit5 = 0;
-	flagalt.free3 = 0;
-	flagalt.bit7 = 0;
     CHG_ON = 1;
     while (1) {        
         ProcessIO();
