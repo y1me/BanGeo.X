@@ -7,7 +7,7 @@ int I2CTimeout;
 char I2C_Op_Reg( uint8_t , uint8_t );
 /*****************************************************************************/
 
-char I2C_Op_Reg( uint8_t op, uint8_t reg)
+char I2C_Op_Reg(const uint8_t op, const uint8_t reg)
 {
      while (I2CnTransmit || (I2CBusy)) {
         if ( I2CTimeout > I2CMaxTimeout )  return I2CFreeBusFail;
@@ -33,7 +33,7 @@ char I2C_Op_Reg( uint8_t op, uint8_t reg)
     return 0;
 }
 
-char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
+char I2C_Write( const uint8_t opcode, const uint8_t regadd, uint8_t *pdata, const uint8_t length)
 {
     I2CTimeout = 0;
     char len =0, error;
@@ -61,7 +61,7 @@ char I2C_Write( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
 }
 
 
-char I2C_Read( uint8_t opcode, uint8_t regadd, uint8_t *pdata, uint8_t length)
+char I2C_Read( const uint8_t opcode, const uint8_t regadd, uint8_t *pdata, const uint8_t length)
 {
     I2CTimeout = 0;
     char len = 0, error,i = 0;

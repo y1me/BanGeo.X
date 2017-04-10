@@ -176,6 +176,10 @@ void SetMux(char cfg)
 
 int Getconv(void)
 {
+  
+/*
+    int getValue(const int * ip) {
+return *ip;*/
     // return conversion value 
     char data[2];
     int conv = 0x8000;
