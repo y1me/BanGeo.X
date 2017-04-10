@@ -3,7 +3,7 @@
 
     #define HARDWARE_PROFILE_H
 
-    #define CLOCK_FREQ          32000000
+    #define _XTAL_FREQ          32000000
 
 /** DEBUG ***********************************************************/
     #define I2CFreeBusFail      0x01        

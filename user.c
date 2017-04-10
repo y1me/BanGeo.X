@@ -157,23 +157,6 @@ void InitI2cChip(void)
     error = I2C_Read(ADD_ADS, CFG_ADS, &draft[0], 2);
 }
 
-void delay_us(unsigned long delay)
-{
-    unsigned long count = 0;
-    while (count < delay){
-            NOP();
-            NOP();
-            NOP();
-            NOP();
-            NOP();
-            NOP();
-            NOP();
-            NOP();
-            count++;
-        }
-}
-
-
 void SetCharge(char cfg)
 {
     // valid input value : FAST_CHG, TAIL_CHG, PRE_CHG 
@@ -331,7 +314,7 @@ void ProcessIO(void)
                 case    'H': // "CH*value1*\n" get ADS value and write in eeprom, user must provide a valid tail address, Beware Overlap!!!!!   
                     eeAddr = 0xF000; 
                     SetMux(RX_BUFF[2]);
-                    delay_us(100000);
+                    __delay_ms(10);
                     Startconv();
                     while (Getconv() == 0x8000);
                     ADSValue = Getconv();
