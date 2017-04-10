@@ -33,7 +33,7 @@
 // Use project enums instead of #define for ON and OFF.
 
 #include <xc.h>
-#include <pic16f18323.h>
+//#include <pic16f18323.h>
 
 #include <stdio.h>
 #include <string.h>
