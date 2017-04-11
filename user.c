@@ -288,12 +288,12 @@ void ProcessIO(void)
                     
                   break;
                 case    'H': // "CH*value1*\n" get ADS value and write in eeprom, user must provide a valid tail address, Beware Overlap!!!!!   
-                    eeAddr = 0xF000; 
-                    SetMux(RX_BUFF[2]);
-                    __delay_ms(10);
-                    Startconv();
-                    while (Getconv() == 0x8000);
-                    ADSValue = Getconv();
+                    eeAddr = 0xF000;
+                    if ( (RX_BUFF[2] % 3) == 0 )ADSValue = AIN[0]; 
+                    if ( (RX_BUFF[2] % 3) == 1 )ADSValue = AIN[1]; 
+                    if ( (RX_BUFF[2] % 3) == 2 )ADSValue = AIN[2]; 
+                    if ( (RX_BUFF[2] % 3) == 3 )ADSValue = AIN[4]; 
+                   
                     RX_BUFF[2] &= EEPROM_ADDR_n_MASK; 
                     eeAddr |= RX_BUFF[2];
                     DATAEE_WriteByte(eeAddr , ADSValue);
