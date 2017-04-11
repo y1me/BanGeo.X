@@ -33,7 +33,9 @@
 /** EEPROM ***********************************************************/
 #define EEPROM_ZERO_ADDR      0xF000
 #define EEPROM_ADDR_n_MASK    0x1F
-
+/***Tilt***************************************************************/
+#define LEFT_TILT       30
+#define RIGHT_TILT      -30
          
 /** P U B L I C  P R O T O T Y P E S *****************************************/
 /***************** USER FUNCTIONS PROTOYPES *********************/

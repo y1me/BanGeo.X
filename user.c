@@ -18,7 +18,7 @@ volatile char AINMux = 0x04, Led = 0, error;
 volatile char draft[10]; 
 volatile int AIN[4];
 volatile int * volatile pAIN;
-static int blink = 50, loopBlink = 0;
+static int blink = 50, loopBlink = 0, zeroTilt = 16000;
 
 volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff;
 
@@ -344,16 +344,19 @@ void ProcessIO(void)
     }
     
     
-if (flag.Button == 1) {
-    TX_BUFF[0] = 'B';
-    TX_BUFF[1] = 'P';
-    TX_BUFF[2] = '\n';
-    pTX_stop = &TX_BUFF[2];
-    StartTX();
-    
-    flag.Button = 0;
+    if (flag.Button == 1) {
+        TX_BUFF[0] = 'B';
+        TX_BUFF[1] = 'P';
+        TX_BUFF[2] = '\n';
+        pTX_stop = &TX_BUFF[2];
+        StartTX();
 
-}
+        flag.Button = 0;
+
+    }
+    
+    
+    
     
     if (blink == loopBlink)
     {
@@ -376,6 +379,23 @@ if (flag.Button == 1) {
             Vbatt = GetADC();//Dummy, lost after mux switch
             Vbatt = GetADC(); //3.11V = 0x304 ratio mesure 34/81
             SetTempMux();
+            diff = zeroTilt;
+            diff -= AIN[3];
+            if (diff > LEFT_TILT) {
+                Led &= 0x7C;
+                Led |= 0x80;
+                SetLed(Led);
+            }
+            else if (diff < RIGHT_TILT) { 
+                Led &= 0x7C;
+                Led |= 0x02;
+                SetLed(Led);
+            }   
+            else{
+                Led &= 0x7C;
+                Led |= 0x01;
+                SetLed(Led);
+            }
          }
         if (loop == 200) //every 20ms
         {
