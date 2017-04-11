@@ -17,41 +17,14 @@ extern volatile struct chbits{
 volatile char AINMux = 0x04, Led = 0, error;  
 volatile char draft[10]; 
 volatile int AIN[4];
-volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff, iMux = 0;
+volatile int * volatile pAIN;
+
+volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff;
 
 extern volatile char RX_BUFF[15];
 extern volatile char TX_BUFF[15];
 extern volatile unsigned char *pRX_W, *pTX_stop, *pTX_W;
 int eeAddr;
-/*
- 
-Here are three examples of pointer definitions using the volatile qualifier. The fields
-in the definitions have been highlighted with spacing:
-volatile int *
-int
-* volatile
-volatile int * volatile
-vip ;
-ivp ;
-vivp ;
-The first example is a pointer called vip. It contains the address of int objects that
-are qualified volatile. The pointer itself ? the variable that holds the address ? is not
-volatile; however, the objects that are accessed when the pointer is dereferenced
-are treated as being volatile. In other words, the target objects accessible via the
-pointer can be externally modified.
-The second example is a pointer called ivp which also contains the address of int
-objects. In this example, the pointer itself is volatile, that is, the address the pointer
-contains can be externally modified; however, the objects that can be accessed when
-dereferencing the pointer are not volatile.
-The last example is of a pointer called vivp which is itself qualified volatile, and
-which also holds the address of volatile objects.
-Bear in mind that one pointer can be assigned the addresses of many objects; for
-example, a pointer that is a parameter to a function is assigned a new object address
-every time the function is called. The definition of the pointer must be valid for every
-target address assigned.
- * 
-*/ 
-
 
 /**
   @Summary
@@ -257,6 +230,7 @@ void ProcessIO(void)
         Startconv();
         SetVbattMux();
         flag.Sys_Init = 1;
+        pAIN = &AIN[0];
     }
     
     if (flag.RxUart)
@@ -425,7 +399,7 @@ if (flag.Button == 1) {
                     PrevTbatt = TEMP_MIN;
                 }
                 diff = Tbatt - PrevTbatt;
-                if (diff > T_DIF_Tail ) {
+                if ( (diff > T_DIF_Tail) || (Tbatt > TEMP_MAX) ) {
                     SetCharge(TAIL_CHG);
                     SetLed(0x03);
                 }
@@ -435,12 +409,13 @@ if (flag.Button == 1) {
 
                 while (Getconv() == 0x8000);
                 
-                AIN[iMux] = Getconv();
-                iMux++; 
+                *pAIN= Getconv();
+                *pAIN++; 
                 AINMux++;
                 if (AINMux > 0x7)
                 {
-                    iMux = 0;
+                    pAIN = &AIN[0];
+              
                     AINMux = 0x04;
                 }
                 SetMux(AINMux << 4);

@@ -12,6 +12,7 @@
 #define V_OVER          1020 // Vmax 
 #define V_DIF_Tail      -15 // Delta V batterie 0.14V
 #define TEMP_MIN        250 //  T min 30°C
+#define TEMP_MAX        392 //  T min 30°C
 #define T_DIF_Tail      70 // Delta T 15°C
 
 #define AIN0            0x40
