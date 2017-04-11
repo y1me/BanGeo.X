@@ -7,11 +7,12 @@
 #define FAST_CHG        0x0C
 #define TAIL_CHG        0x00
 #define PRE_CHG         0x08
-#define V_PRE           0x236
-#define V_TAIL          0x3B0
-#define V_OVER          0x3FF
-#define V_DIF_Tail      -7
-#define T_DIF_Tail      10
+#define V_PRE           492 // Vbat*0.42 (ratio diviseur de tension) = Vadc 
+#define V_TAIL          850 //8.09V
+#define V_OVER          1020 // Vmax 
+#define V_DIF_Tail      -15 // Delta V batterie 0.14V
+#define TEMP_MIN        250 //  T min 30°C
+#define T_DIF_Tail      70 // Delta T 15°C
 
 #define AIN0            0x40
 #define AIN1            0x50

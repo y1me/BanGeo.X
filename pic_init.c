@@ -170,10 +170,10 @@ void INT_Init(void)  //init Interrupt
   
 */
 }
-
+/*
 void Timer0_Init(void)  //init timer0
 {
-	/*
+	
 	T0CONbits.T08BIT = 0;
 	T0CONbits.T0CS = 0;
 	T0CONbits.PSA = 0;
@@ -185,12 +185,12 @@ void Timer0_Init(void)  //init timer0
 	INTCON2bits.TMR0IP = 0;
 
 	T0CONbits.TMR0ON = 1;
-     */ 
+     
 }
 
 void Timer1_Init(void)  //init timer1
 {
-	/*
+	
 	T1CONbits.RD16 = 1;
 	T1CONbits.TMR1CS = 0;
 	T1CONbits.T1CKPS1 = 0;
@@ -201,9 +201,9 @@ void Timer1_Init(void)  //init timer1
 	IPR1bits.TMR1IP = 1;
 
 	T1CONbits.TMR1ON = 0;
-     */ 
+     
 }
-
+*/
 void Timer2_Init(void)  //init timer2
 {
     T2CONbits.T2OUTPS = 0; // postscaler = 1/1

@@ -14,7 +14,7 @@ extern volatile struct chbits{
 		
 					}flag ;
 
-volatile char AINMux = 0x04, Led = 0;;  
+volatile char AINMux = 0x04, Led = 0, error;  
 volatile char draft[10]; 
 volatile int AIN[4];
 volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff, iMux = 0;
@@ -255,6 +255,7 @@ void ProcessIO(void)
         //InitBLE();
         AINMux = 0x04;
         Startconv();
+        SetVbattMux();
         flag.Sys_Init = 1;
     }
     
@@ -384,36 +385,49 @@ if (flag.Button == 1) {
     {
         loop++;
          if (loop == 100) {
-             Startconv();
+            Startconv();
+            Vbatt = GetADC();//Dummy, lost after mux switch
+            Vbatt = GetADC(); //3.11V = 0x304 ratio mesure 34/81
+            SetTempMux();
          }
         if (loop == 200) //every 20ms
         {
-            SetTempMux(); 
-            PrevTbatt = Tbatt;
+             
             Tbatt = GetADC();//Dummy, lost after mux switch
             Tbatt = GetADC();// 0.847 = 0xd2
             SetVbattMux();
-            PrevVbatt = Vbatt;
-            Vbatt = GetADC();//Dummy, lost after mux switch
-            Vbatt = GetADC(); //3.11V = 0x304 ratio mesure 34/81
+            
        
             if (Vbatt < V_PRE){
                 SetCharge(PRE_CHG);
+                SetLed(0xC0);
             }
             else if (Vbatt < V_TAIL) {
+                //SetCharge(PRE_CHG);
                 SetCharge(FAST_CHG);
                 PrevVbatt = Vbatt;
+                PrevTbatt = Tbatt;
+                SetLed(0x30);
             }
             else {
                if (PrevVbatt < Vbatt) {
                     PrevVbatt = Vbatt;   
                 }
-                diff = Vbatt - PrevVbatt;
-                if ( diff < V_DIF_Tail ) {
-                    SetCharge(TAIL_CHG);
+               if (PrevTbatt > Tbatt) {
+                    PrevTbatt = Tbatt;   
                 }
-                if ( (Tbatt - PrevTbatt) > T_DIF_Tail ) {
+                diff = Vbatt - PrevVbatt;
+                if ( (diff < V_DIF_Tail) || (Vbatt > V_OVER) ) {
                     SetCharge(TAIL_CHG);
+                    SetLed(0x03);
+                }
+                if (PrevTbatt < TEMP_MIN) {
+                    PrevTbatt = TEMP_MIN;
+                }
+                diff = Tbatt - PrevTbatt;
+                if (diff > T_DIF_Tail ) {
+                    SetCharge(TAIL_CHG);
+                    SetLed(0x03);
                 }
                 
             }
