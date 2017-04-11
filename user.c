@@ -357,7 +357,7 @@ if (flag.Button == 1) {
     
     if (blink == loopBlink)
     {
-        if ( (Led & 0x10) == 0x10) { 
+        if ( (Led & 0x10) == 0x10 && !VOFFCHG) { 
             Led &= 0xEF;
             SetLed(Led);
         }
