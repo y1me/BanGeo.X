@@ -18,6 +18,7 @@ volatile char AINMux = 0x04, Led = 0, error;
 volatile char draft[10]; 
 volatile int AIN[4];
 volatile int * volatile pAIN;
+static int blink = 50, loopBlink = 0;
 
 volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff;
 
@@ -353,7 +354,19 @@ if (flag.Button == 1) {
     flag.Button = 0;
 
 }
-        
+    
+    if (blink == loopBlink)
+    {
+        if ( (Led & 0x10) == 0x10) { 
+            Led &= 0xEF;
+            SetLed(Led);
+        }
+        else {
+            Led |= 0x10;
+            SetLed(Led);
+        }
+        loopBlink = 0;
+    }
 
     if (flag.tim100u) //every 100µs
     {
@@ -366,7 +379,7 @@ if (flag.Button == 1) {
          }
         if (loop == 200) //every 20ms
         {
-             
+            loopBlink++; 
             Tbatt = GetADC();//Dummy, lost after mux switch
             Tbatt = GetADC();// 0.847 = 0xd2
             SetVbattMux();
@@ -374,14 +387,14 @@ if (flag.Button == 1) {
        
             if (Vbatt < V_PRE){
                 SetCharge(PRE_CHG);
-                SetLed(0xC0);
+                blink = 10;
             }
             else if (Vbatt < V_TAIL) {
                 //SetCharge(PRE_CHG);
                 SetCharge(FAST_CHG);
                 PrevVbatt = Vbatt;
                 PrevTbatt = Tbatt;
-                SetLed(0x30);
+                blink = 5;
             }
             else {
                if (PrevVbatt < Vbatt) {
@@ -393,7 +406,7 @@ if (flag.Button == 1) {
                 diff = Vbatt - PrevVbatt;
                 if ( (diff < V_DIF_Tail) || (Vbatt > V_OVER) ) {
                     SetCharge(TAIL_CHG);
-                    SetLed(0x03);
+                    blink = 50;
                 }
                 if (PrevTbatt < TEMP_MIN) {
                     PrevTbatt = TEMP_MIN;
@@ -401,7 +414,7 @@ if (flag.Button == 1) {
                 diff = Tbatt - PrevTbatt;
                 if ( (diff > T_DIF_Tail) || (Tbatt > TEMP_MAX) ) {
                     SetCharge(TAIL_CHG);
-                    SetLed(0x03);
+                    blink = 50;
                 }
                 
             }
