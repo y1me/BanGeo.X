@@ -40,4 +40,12 @@ third (answer)  = "X" byte answer length
   Recv = nothing
 
   Send = "CK*value*\n"  : Read calibration value in EEprom
-  Recv = "RK2*Caliblsb* *Calibmsb*\n" :
+  Recv = "RK2*Caliblsb* *Calibmsb*\n" 
+
+Bluetooth connection :
+
+pair device
+sudo rfcomm bind /dev/rfcomm0 <device address>
+
+
+

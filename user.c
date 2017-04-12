@@ -18,7 +18,7 @@ volatile char AINMux = 0x04, Led = 0, error;
 volatile char draft[10]; 
 volatile int AIN[4];
 volatile int * volatile pAIN;
-static int blink = 50, loopBlink = 0, zeroTilt = 16000;
+static int blink = 50, loopBlink = 0, zeroTilt;
 int eeAddr;
 volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff;
 
@@ -56,23 +56,26 @@ extern volatile unsigned char *pRX_W, *pTX_stop, *pTX_W;
 
 void DATAEE_WriteByte(uint16_t bAdd, uint8_t bData)
 {
-
-    NVMADRH = ((bAdd >> 8) & 0xFF);
-    NVMADRL = (bAdd & 0xFF);
-    NVMDATL = bData;    
+    INTCONbits.GIE = 0;     // Disable interrupts
+    INTCONbits.PEIE = 0;
     NVMCON1bits.NVMREGS = 1;
     NVMCON1bits.WREN = 1;
-    INTCONbits.GIE = 0;     // Disable interrupts
+    
+    NVMADRH = ((bAdd >> 8) & 0xFF);
+    NVMADRL = (bAdd & 0xFF);
+    NVMDATL = bData;      
+    
     NVMCON2 = 0x55;
     NVMCON2 = 0xAA;
     NVMCON1bits.WR = 1;
     // Wait for write to complete
-    while (NVMCON1bits.WR)
+    while (NVMCON1bits.WR);
     {
     }
 
     NVMCON1bits.WREN = 0;
     INTCONbits.GIE = 1;   // restore interrupt enable
+    INTCONbits.PEIE = 1;
 }
 
 /**
@@ -231,6 +234,10 @@ void ProcessIO(void)
         Startconv();
         SetVbattMux();
         flag.Sys_Init = 1;
+        //Set zero tilt    
+        zeroTilt = DATAEE_ReadByte(ZERO_TILT_ADDR + 1);
+        zeroTilt <<= 8;
+        zeroTilt |= DATAEE_ReadByte(ZERO_TILT_ADDR);
         pAIN = &AIN[0];
     }
     
@@ -248,6 +255,8 @@ void ProcessIO(void)
                     TX_BUFF[5] = 'R';// R : right, L : left 
                     TX_BUFF[6] = '\n';
                     pTX_stop = &TX_BUFF[6];
+                    
+                    StartTX();
                   break;
                 case    'B': // "CB\n" disable charge mode
                     CHG_ON = 0;
@@ -296,7 +305,8 @@ void ProcessIO(void)
                   break;
                 case    'H': // "CH*value1*\n" get ADS value and write in eeprom, user must provide a valid tail address, Beware Overlap!!!!!   
                     
-                    eeAddr = RX_BUFF[2] % 3;
+                    eeAddr = RX_BUFF[2];
+                    eeAddr %= 4;
                     ADSValue = AIN[ eeAddr ];         
                     if (RX_BUFF[2] == ZERO_TILT_ASCII) {
                         zeroTilt = ADSValue;

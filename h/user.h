@@ -41,6 +41,7 @@
 #define LEFT_TILT           30
 #define RIGHT_TILT          -30
 #define ZERO_TILT_ASCII     '3'
+#define ZERO_TILT_ADDR      0xF066
          
 /** P U B L I C  P R O T O T Y P E S *****************************************/
 /***************** USER FUNCTIONS PROTOYPES *********************/
