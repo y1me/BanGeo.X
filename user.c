@@ -239,14 +239,21 @@ void ProcessIO(void)
         if (RX_BUFF[0] == 'C')
         {
             switch(RX_BUFF[1])  {
-                case    'A': // "CA\n" enable charge mode
-                    //CHG_ON = 1;
+                case    'A': // "CA\n" Device identification
+                    TX_BUFF[0] = 'R';
+                    TX_BUFF[1] = 'A';
+                    TX_BUFF[2] = '3';
+                    TX_BUFF[3] = 'H';// H : head, P : Plate 
+                    TX_BUFF[4] = 'F';// F : front, B : back
+                    TX_BUFF[5] = 'R';// R : right, L : left 
+                    TX_BUFF[6] = '\n';
+                    pTX_stop = &TX_BUFF[6];
                   break;
                 case    'B': // "CB\n" disable charge mode
-                   // CHG_ON = 0;
+                    CHG_ON = 0;
                   break;
-                case    'C': // "CC\n" 
-                 
+                case    'C': // "CC\n" enable charge mode
+                    CHG_ON = 1;
                   break;
                 case    'D':  // "CD*value*\n" set led, valid value: 0bxxxx00xx 
                     Led |= RX_BUFF[2];
