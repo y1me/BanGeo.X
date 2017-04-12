@@ -100,13 +100,12 @@ void interrupt ISR(void)
         flag.Button = 1;
         INT_EXT_F = 0;
     } 
-    if(PIR1bits.TMR1GIF) {
-        PIR1bits.TMR1GIF = 0;
-    }
+    
+
     if(PIR2bits.NVMIF) {
         PIR2bits.NVMIF = 0;
     }
-
+     
 }
 
 

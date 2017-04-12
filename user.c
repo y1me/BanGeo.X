@@ -19,13 +19,13 @@ volatile char draft[10];
 volatile int AIN[4];
 volatile int * volatile pAIN;
 static int blink = 50, loopBlink = 0, zeroTilt = 16000;
-
+int eeAddr;
 volatile int ADSValue, Vbatt = 0, Tbatt = 0, PrevVbatt = 0, PrevTbatt = 0, loop = 0, diff;
 
 extern volatile char RX_BUFF[15];
 extern volatile char TX_BUFF[15];
 extern volatile unsigned char *pRX_W, *pTX_stop, *pTX_W;
-int eeAddr;
+
 
 /**
   @Summary
@@ -240,10 +240,10 @@ void ProcessIO(void)
         {
             switch(RX_BUFF[1])  {
                 case    'A': // "CA\n" enable charge mode
-                    CHG_ON = 1;
+                    //CHG_ON = 1;
                   break;
                 case    'B': // "CB\n" disable charge mode
-                    CHG_ON = 0;
+                   // CHG_ON = 0;
                   break;
                 case    'C': // "CC\n" 
                  
@@ -288,13 +288,15 @@ void ProcessIO(void)
                     
                   break;
                 case    'H': // "CH*value1*\n" get ADS value and write in eeprom, user must provide a valid tail address, Beware Overlap!!!!!   
+                    
+                    eeAddr = RX_BUFF[2] % 3;
+                    ADSValue = AIN[ eeAddr ];         
+                    if (RX_BUFF[2] == ZERO_TILT_ASCII) {
+                        zeroTilt = ADSValue;
+                    }
                     eeAddr = 0xF000;
-                    if ( (RX_BUFF[2] % 3) == 0 )ADSValue = AIN[0]; 
-                    if ( (RX_BUFF[2] % 3) == 1 )ADSValue = AIN[1]; 
-                    if ( (RX_BUFF[2] % 3) == 2 )ADSValue = AIN[2]; 
-                    if ( (RX_BUFF[2] % 3) == 3 )ADSValue = AIN[4]; 
-                   
-                    RX_BUFF[2] &= EEPROM_ADDR_n_MASK; 
+                    //RX_BUFF[2] &= EEPROM_ADDR_n_MASK; // mask to receive ascii character
+                    RX_BUFF[2] += RX_BUFF[2];
                     eeAddr |= RX_BUFF[2];
                     DATAEE_WriteByte(eeAddr , ADSValue);
                     DATAEE_WriteByte(eeAddr + 1, ADSValue >> 8);
@@ -309,7 +311,8 @@ void ProcessIO(void)
                   break;
                 case    'K': // "CK*value*\n" return ZERO, upper bound, lower bound calib user must provide a valid tail address 
                     eeAddr = 0xF000; 
-                    RX_BUFF[2] &= EEPROM_ADDR_n_MASK;
+                    RX_BUFF[2] += RX_BUFF[2];
+                    //RX_BUFF[2] &= EEPROM_ADDR_n_MASK;
                     eeAddr |= RX_BUFF[2];
 
                     TX_BUFF[4] = DATAEE_ReadByte(eeAddr);
@@ -324,16 +327,7 @@ void ProcessIO(void)
                     StartTX();
                         
                   break;
-                case    'L': // "CL*value*\n" return upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-               
-                  break;
-                case    'M': // "CM\n" Enable continuous conversion on ADS 
-                    flag.cont = 1;
-                  break;
-                case    'N': // "CN\n" Disable continuous conversion on ADS   
-                    
-                    flag.cont = 0;
-                  break;
+
             }
         }
         RX_BUFF[0] = 0;
@@ -341,8 +335,7 @@ void ProcessIO(void)
         RX_BUFF[2] = 0;
         RX_BUFF[3] = 0;
         flag.RxUart = 0;
-    }
-    
+    } 
     
     if (flag.Button == 1) {
         TX_BUFF[0] = 'B';
@@ -354,10 +347,7 @@ void ProcessIO(void)
         flag.Button = 0;
 
     }
-    
-    
-    
-    
+
     if (blink == loopBlink)
     {
         if ( (Led & 0x10) == 0x10 && !VOFFCHG) { 
@@ -407,14 +397,13 @@ void ProcessIO(void)
        
             if (Vbatt < V_PRE){
                 SetCharge(PRE_CHG);
-                blink = 10;
+                blink = BLINK_PRE;
             }
             else if (Vbatt < V_TAIL) {
-                //SetCharge(PRE_CHG);
                 SetCharge(FAST_CHG);
                 PrevVbatt = Vbatt;
                 PrevTbatt = Tbatt;
-                blink = 5;
+                blink = BLINK_FAST;
             }
             else {
                if (PrevVbatt < Vbatt) {
@@ -426,7 +415,7 @@ void ProcessIO(void)
                 diff = Vbatt - PrevVbatt;
                 if ( (diff < V_DIF_Tail) || (Vbatt > V_OVER) ) {
                     SetCharge(TAIL_CHG);
-                    blink = 50;
+                    blink = BLINK_TAIL;
                 }
                 if (PrevTbatt < TEMP_MIN) {
                     PrevTbatt = TEMP_MIN;
@@ -434,7 +423,7 @@ void ProcessIO(void)
                 diff = Tbatt - PrevTbatt;
                 if ( (diff > T_DIF_Tail) || (Tbatt > TEMP_MAX) ) {
                     SetCharge(TAIL_CHG);
-                    blink = 50;
+                    blink = BLINK_TAIL;
                 }
                 
             }

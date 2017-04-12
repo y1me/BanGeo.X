@@ -25,6 +25,10 @@
 
 #define CHG_n_MASK      0xF3
 #define CHG_MASK        0x0C
+
+#define BLINK_PRE       10
+#define BLINK_FAST      5
+#define BLINK_TAIL       20
 /** ADC & ADS ***********************************************************/
 #define MUX_n_MASK      0x8F
 #define MUX_MASK        0x70
@@ -34,8 +38,9 @@
 #define EEPROM_ZERO_ADDR      0xF000
 #define EEPROM_ADDR_n_MASK    0x1F
 /***Tilt***************************************************************/
-#define LEFT_TILT       30
-#define RIGHT_TILT      -30
+#define LEFT_TILT           30
+#define RIGHT_TILT          -30
+#define ZERO_TILT_ASCII     '3'
          
 /** P U B L I C  P R O T O T Y P E S *****************************************/
 /***************** USER FUNCTIONS PROTOYPES *********************/

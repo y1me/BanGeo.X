@@ -32,17 +32,17 @@
 
 
     char I2C_Write(
-            uint8_t opcode,
-            uint8_t regadd,
+            const uint8_t opcode,
+            const uint8_t regadd,
             uint8_t *pdata,
-            uint8_t length);
+            const uint8_t length);
 
 
     char I2C_Read(
-            uint8_t opcode,
-            uint8_t regadd,
+            const uint8_t opcode,
+            const uint8_t regadd,
             uint8_t *pdata,
-            uint8_t length);
+            const uint8_t length);
 
 #endif //_I2C_H
 

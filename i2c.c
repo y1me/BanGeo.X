@@ -4,7 +4,7 @@
 int I2CTimeout;
 
 /** P R I V A T E  P R O T O T Y P E S ***************************************/
-char I2C_Op_Reg( uint8_t , uint8_t );
+char I2C_Op_Reg(const uint8_t , const uint8_t );
 /*****************************************************************************/
 
 char I2C_Op_Reg(const uint8_t op, const uint8_t reg)
