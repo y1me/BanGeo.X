@@ -275,7 +275,7 @@ void ProcessIO(void)
                     
                     StartTX();
                   break;
-                case    'G':
+                case    'G': // "CG\n" get sensors value
                     
                     TX_BUFF[0] = 'R';
                     TX_BUFF[1] = 'G';
