@@ -26,8 +26,8 @@
 #define CHG_n_MASK      0xF3
 #define CHG_MASK        0x0C
 
-#define BLINK_PRE       10
-#define BLINK_FAST      5
+#define BLINK_PRE       5
+#define BLINK_FAST      10
 #define BLINK_TAIL       20
 /** ADC & ADS ***********************************************************/
 #define MUX_n_MASK      0x8F
