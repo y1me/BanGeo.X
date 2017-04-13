@@ -365,13 +365,17 @@ void ProcessIO(void)
 
     }
 
-    if (blink == loopBlink)
+    if (blink <= loopBlink)
     {
         if ( (Led & 0x10) == 0x10 && !VOFFCHG) { 
             Led &= 0xEF;
             SetLed(Led);
         }
         else {
+            Led |= 0x10;
+            SetLed(Led);
+        }
+        if (VOFFCHG) {
             Led |= 0x10;
             SetLed(Led);
         }
@@ -384,7 +388,7 @@ void ProcessIO(void)
          if (loop == 100) {
             Startconv();
             Vbatt = GetADC();//Dummy, lost after mux switch
-            Vbatt = GetADC(); //3.11V = 0x304 ratio mesure 34/81
+            Vbatt = GetADC(); // ratio mesure 0.42
             SetTempMux();
             diff = zeroTilt;
             diff -= AIN[3];
@@ -463,9 +467,5 @@ void ProcessIO(void)
         }
         flag.tim100u = 0;
     }
-    
-    
-
-    
 }
 
