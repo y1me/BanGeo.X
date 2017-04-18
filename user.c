@@ -384,8 +384,10 @@ void ProcessIO(void)
 
     if (flag.tim100u) //every 100µs
     {
+        
         loop++;
          if (loop == 100) {
+            CLRWDT();
             Startconv();
             Vbatt = GetADC();//Dummy, lost after mux switch
             Vbatt = GetADC(); // ratio mesure 0.42

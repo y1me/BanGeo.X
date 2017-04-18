@@ -127,7 +127,11 @@ void USART_Init(void)  //init USART
     TX1STAbits.TXEN = 0;
     
 }
-
+void WDT_Init(void)  //init Interrupt
+{
+    WDTCONbits.WDTPS = 8; // max reset interval 256ms
+    WDTCONbits.SWDTEN = 1;
+}
 void INT_Init(void)  //init Interrupt
 {
     //I2C interrupt
