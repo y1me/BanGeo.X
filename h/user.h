@@ -34,6 +34,7 @@
 #define MUX_MASK        0x70
 #define CONV_n_MASK     0x7F
 #define CONV_MASK       0x80
+#define CONV_ATTEMPT    20
 /** EEPROM ***********************************************************/
 #define EEPROM_ZERO_ADDR      0xF000
 #define EEPROM_ADDR_n_MASK    0x1F

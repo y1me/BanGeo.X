@@ -165,16 +165,9 @@ void SetMux(char cfg)
 
 int Getconv(void)
 {
-  
-/*
-    int getValue(const int * ip) {
-return *ip;*/
     // return conversion value 
     char data[2];
     int conv = 0x8000;
-    error = I2C_Read(ADD_ADS, CONV_ADS, &data[0], 2);
-    if (data[0] > 128 ) return conv;
-    
     error = I2C_Read(ADD_ADS, CONV_ADS, &data[0], 2);
     conv |= data[0];
     conv = conv << 8;
@@ -212,7 +205,8 @@ void Startconv(void)
         error = I2C_Read(ADD_ADS, CFG_ADS, &data[0], 2);
     }
     data[0] |= CONV_MASK; 
-    error = I2C_Write(ADD_ADS, CFG_ADS, &data[0], 2); 
+    error = I2C_Write(ADD_ADS, CFG_ADS, &data[0], 2);
+    error = I2C_Read(ADD_ADS, CFG_ADS, &draft[0], 2);
 }
 
 void StartTX(void)
@@ -252,7 +246,7 @@ void ProcessIO(void)
                     TX_BUFF[2] = '3';
                     TX_BUFF[3] = 'H';// H : head, P : Plate 
                     TX_BUFF[4] = 'F';// F : front, B : back
-                    TX_BUFF[5] = 'R';// R : right, L : left 
+                    TX_BUFF[5] = 'L';// R : right, L : left 
                     TX_BUFF[6] = '\n';
                     pTX_stop = &TX_BUFF[6];
                     
@@ -451,9 +445,7 @@ void ProcessIO(void)
                 
             }
             loop = 0;
-
-                while (Getconv() == 0x8000);
-                
+            
                 *pAIN= Getconv();
                 *pAIN++; 
                 AINMux++;

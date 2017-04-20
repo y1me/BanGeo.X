@@ -12,7 +12,7 @@
 
 #define I2CBusy              SSP1CON2 & 0x1F
 #define I2CnTransmit         SSP1STATbits.R_nW
-#define I2CMaxTimeout        100
+#define I2CMaxTimeout        50
 
 /** I2C ************************************************************/
 #define I2C_ACKEN             SSP1CON2bits.ACKEN
