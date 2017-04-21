@@ -35,7 +35,10 @@ third (answer)  = "X" byte answer length
   Recv = nothing
     Value to send must be a 128 contiguous set. 
     Value written in eeprom depend on value modulo 3 result 
- 
+    Start with value '0'
+    '0' is address for sensor 0 zero, '1' is address for sensor 1 zero,etc...
+    '3' is address for tilt sensor zero (HW : plug tilt on S3 connector)
+
   Send = "CI*value*\n clear led, valid value: 0bxxxx00xx
   Recv = nothing
 
