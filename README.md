@@ -38,6 +38,11 @@ third (answer)  = "X" byte answer length
     Start with value '0'
     '0' is address for sensor 0 zero, '1' is address for sensor 1 zero,etc...
     '3' is address for tilt sensor zero (HW : plug tilt on S3 connector)
+    '0' : Zero 0, '4' : Lower Bound 0, '8' : Upper Bound 0
+    '1' : Z1, '5' : LB1, '9' : UB0
+    '2' : Z2, '6' : LB3, ':' : UB0
+    '3' : Z3, '7' : LB3, ';' : UB0
+
 
   Send = "CI*value*\n clear led, valid value: 0bxxxx00xx
   Recv = nothing
