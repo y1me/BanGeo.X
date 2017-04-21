@@ -233,6 +233,8 @@ void ProcessIO(void)
         zeroTilt <<= 8;
         zeroTilt |= DATAEE_ReadByte(ZERO_TILT_ADDR);
         pAIN = &AIN[0];
+        SetCharge(TAIL_CHG);
+        blink = BLINK_TAIL;
     }
     
     if (flag.RxUart)

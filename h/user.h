@@ -7,12 +7,12 @@
 #define FAST_CHG        0x0C
 #define TAIL_CHG        0x00
 #define PRE_CHG         0x08
-#define V_PRE           492 // Vbat*0.42 (ratio diviseur de tension) = Vadc 
-#define V_TAIL          850 //8.09V
-#define V_OVER          1020 // Vmax 
-#define V_DIF_Tail      -15 // Delta V batterie 0.14V
+#define V_PRE           422 // pre-charge until 4.8V (0.352 ratio diviseur de tension) 
+#define V_TAIL          704 //start fast-charge under 8V, start monitoring above 
+#define V_OVER          924 // Vmax 10.5V 
+#define V_DIF_Tail      -12 // Delta V batterie 0.14V
 #define TEMP_MIN        250 //  T min 30°C
-#define TEMP_MAX        392 //  T min 30°C
+#define TEMP_MAX        392 //  T min 60°C
 #define T_DIF_Tail      70 // Delta T 15°C
 
 #define AIN0            0x40
@@ -28,7 +28,7 @@
 
 #define BLINK_PRE       5
 #define BLINK_FAST      10
-#define BLINK_TAIL       20
+#define BLINK_TAIL      60
 /** ADC & ADS ***********************************************************/
 #define MUX_n_MASK      0x8F
 #define MUX_MASK        0x70
