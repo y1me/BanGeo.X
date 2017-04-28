@@ -9,7 +9,7 @@
 #define PRE_CHG         0x08
 #define V_PRE           422 // pre-charge until 4.8V (0.352 ratio diviseur de tension) 
 #define V_TAIL          704 //start fast-charge under 8V, start monitoring above 
-#define V_OVER          924 // Vmax 10.5V 
+#define V_OVER          890 // Vmax 10.5V 
 #define V_DIF_Tail      -12 // Delta V batterie 0.14V
 #define TEMP_MIN        250 //  T min 30°C
 #define TEMP_MAX        392 //  T min 60°C
