@@ -254,7 +254,17 @@ void ProcessIO(void)
                     CHG_ON = 0;
                   break;
                 case    'C': // "CC\n" 
-                 
+                    TX_BUFF[0] = 'R';
+                    TX_BUFF[1] = 'F';
+                    TX_BUFF[2] = '4';
+                    TX_BUFF[3] = 'F';
+                    TX_BUFF[4] = 'P';
+                    TX_BUFF[5] = 'R';
+                    TX_BUFF[6] = ' ';
+                    TX_BUFF[7] = '\n';
+                    pTX_stop = &TX_BUFF[7];
+                    
+                    StartTX();
                   break;
                 case    'D':  // "CD*value*\n" set led, valid value: 0bxxxx00xx 
                     Led |= RX_BUFF[2];
