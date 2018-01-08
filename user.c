@@ -259,7 +259,7 @@ void ProcessIO(void)
                     TX_BUFF[2] = '4';
                     TX_BUFF[3] = 'F';
                     TX_BUFF[4] = 'P';
-                    TX_BUFF[5] = 'R';
+                    TX_BUFF[5] = 'L';
                     TX_BUFF[6] = ' ';
                     TX_BUFF[7] = '\n';
                     pTX_stop = &TX_BUFF[7];
@@ -312,7 +312,7 @@ void ProcessIO(void)
                     Startconv();
                     while (Getconv() == 0x8000);
                     ADSValue = Getconv();
-                    RX_BUFF[2] &= EEPROM_ADDR_n_MASK; 
+                    //RX_BUFF[2] &= EEPROM_ADDR_n_MASK; 
                     eeAddr |= RX_BUFF[2];
                     DATAEE_WriteByte(eeAddr , ADSValue);
                     DATAEE_WriteByte(eeAddr + 1, ADSValue >> 8);
@@ -327,7 +327,7 @@ void ProcessIO(void)
                   break;
                 case    'K': // "CK*value*\n" return ZERO, upper bound, lower bound calib user must provide a valid tail address 
                     eeAddr = 0xF000; 
-                    RX_BUFF[2] &= EEPROM_ADDR_n_MASK;
+                    //RX_BUFF[2] &= EEPROM_ADDR_n_MASK;
                     eeAddr |= RX_BUFF[2];
 
                     TX_BUFF[4] = DATAEE_ReadByte(eeAddr);

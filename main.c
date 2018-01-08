@@ -19,7 +19,7 @@
 #pragma config BORV = LOW       // Brown-out Reset Voltage selection bit (Brown-out voltage (Vbor) set to 2.45V)
 #pragma config PPS1WAY = ON     // PPSLOCK bit One-Way Set Enable bit (The PPSLOCK bit can be cleared and set only once; PPS registers remain locked after one clear/set cycle)
 #pragma config STVREN = ON      // Stack Overflow/Underflow Reset Enable bit (Stack Overflow or Underflow will cause a Reset)
-#pragma config DEBUG = ON       // Debugger enable bit (Background debugger enabled)
+#pragma config DEBUG = OFF       // Debugger enable bit (Background debugger enabled)
 
 // CONFIG3
 #pragma config WRT = OFF        // User NVM self-write protection bits (Write protection off)
