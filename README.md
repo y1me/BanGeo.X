@@ -1,24 +1,59 @@
 # BanGeo.X
+Embedded software based on pic16f18323.
+the aim was to retrofit a wheel alignment system, FACOM GTR530.
+Replace old electronics by a modern pcb with pic16f18323 (control), ads1115 (data acquisition), mcp1631 (battery management) and HC-05 (bluetooth connectivity).
+
+Communication to PC or android device with bluetooth serial port.
+Protocol :
+first byte =  "C" : command, "R" : answer
+second = "X" id
+third (answer)  = "X" byte answer length
+  
+  Send = "CA\n"  : Device identification
+  Recv = "RA3HFR\n" : H : head, P : Plate, F : front, B : back, R : right, L : left
+
+  Send = "CB\n"  : disable charge mode
+  Recv = nothing
+
+  Send = "CC\n"  : enable charge mode
+  Recv = nothing
+
+  Send = "CD*value*\n"  : set led, valid value: 0bxxxx00xx
+  Recv = nothing
+
+  Send = "CE*value*\n"  : set ADS1115 Mux, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)
+  Recv = nothing
+
+  Send = "CF\n"  : get battery temperature and voltage
+  Recv = "RF4*Tlsb* *Tmsb* *Vlsb* *Vmsb*\n" : Temperature = mcp9701 10bits value, Voltage = ratio 0.42 10bits value, Vref 4.096
+
+  Send = "CG\n"  : get 4 sensors values
+  Recv = "RF8*Sensor0lsb* *Sensor0msb* *Sensor1lsb* *Sensor1msb* *Sensor2lsb* *Sensor2msb* *Sensor3lsb* *Sensor3msb*\n" :
+    Sensor value coded on 15bits with Vref = 4.096V
+
+  Send = "CH*value*\n"  : Write calibration value in EEprom
+  Recv = nothing
+    Value to send must be a 128 contiguous set. 
+    Value written in eeprom depend on value modulo 3 result 
+    Start with value '0'
+    '0' is address for sensor 0 zero, '1' is address for sensor 1 zero,etc...
+    '3' is address for tilt sensor zero (HW : plug tilt on S3 connector)
+    '0' : Zero 0, '4' : Lower Bound 0, '8' : Upper Bound 0
+    '1' : Z1, '5' : LB1, '9' : UB0
+    '2' : Z2, '6' : LB3, ':' : UB0
+    '3' : Z3, '7' : LB3, ';' : UB0
 
 
-"CA\n" enable charge mode
-"CB\n" disable charge mode
-"CC\n" get device name
-    Return : "RF4xxxx\n"
-"CD*value*\n" set led, valid value: 0bxxxx00xx 
-"CE*value*\n" set ADS1115 Mux, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70) 
-"CF\n" get battery temperature and voltage
-    Return : "RF4*T_LSB**T_MSB**V_LSB**V_MSB*\n"
-"CG\n" get 4 sensors value 
-    Return : "RF8*S0_LSB**S0_MSB**S1_LSB**S1_MSB**S2_LSB**S2_MSB**S3_LSB**S3_MSB*\n"
-"CH*value1*\n" get ADS value and write in eeprom, user must provide a valid tail address, Beware Overlap!!!!!
-    Only used with calibration script
-"CI*value*\n clear led, valid value: 0bxxxx00xx 
-"CJ*value*\n command not implemented yet
-"CK*value*\n" return ZERO, upper bound, lower bound calib user must provide a valid tail address 
-"CL*value*\n" return upper bound calib on AIN0, AIN1, AIN2 or AIN3, valid value: AIN0(0x40), AIN1(0x50), AIN2(0x60), AIN3(0x70)  
-    feature not implemented yet
-"CM\n" Enable continuous conversion on ADS 
-    feature not implemented yet
-"CN\n" Disable continuous conversion on ADS   
-    feature not implemented yet
+  Send = "CI*value*\n clear led, valid value: 0bxxxx00xx
+  Recv = nothing
+
+  Send = "CK*value*\n"  : Read calibration value in EEprom
+  Recv = "RK2*Caliblsb* *Calibmsb*\n" 
+
+Bluetooth connection :
+
+pair device
+sudo rfcomm bind /dev/rfcomm0 <device address>
+
+
+
